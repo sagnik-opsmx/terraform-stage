@@ -1,2 +1,0 @@
-# terraform-stage
-terraform-stage
