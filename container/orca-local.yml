@@ -1,12 +1,12 @@
 job:
-  preconfigured:
-    kubernetes:      
+  preconfigured: 
+  kubernetes:
       - label: TSPlanJob
-        application: terratest
+        application: terraformdemo
         cloudProvider: kubernetes
-        credentials: default
+        credentials: target-aks-cluster
         description: Stage for terraspin plan operation
-        account: default
+        account: target-aks-cluster
         type: customTSPlanJobStage
         waitForCompletion: true
         parameters:
@@ -48,7 +48,7 @@ job:
           kind: Job
           metadata:
             name: terraspinplanjob
-            namespace: spin
+            namespace: spinterra
           spec:
             backoffLimit: 0
             template:
@@ -83,11 +83,11 @@ job:
 
 
       - label: TSApplyJob
-        application: terratest
+        application: terraspin
         cloudProvider: kubernetes
-        credentials: default
+        credentials: target-aks-cluster
         description: Stage for terraspin apply operation
-        account: default
+        account: target-aks-cluster
         propertyFile: terraspinapply
         type: customTSApplyJobStage
         waitForCompletion: true
@@ -125,7 +125,7 @@ job:
           kind: Job
           metadata:
             name: terraspinapplyjob
-            namespace: spin
+            namespace: spinterra
           spec:
             backoffLimit: 0
             template:
@@ -158,11 +158,11 @@ job:
 
 
       - label: TSDestroyJob
-        application: terratest
+        application: terraspin
         cloudProvider: kubernetes
-        credentials: default
+        credentials: target-aks-cluster
         description: Stage for terraspin destroy operation
-        account: default
+        account: target-aks-cluster
         type: customTSDestroyJobStage
         waitForCompletion: true
         parameters:
@@ -194,7 +194,7 @@ job:
           kind: Job
           metadata:
             name: terraspindestroyjob
-            namespace: spin
+            namespace: spinterra
           spec:
             backoffLimit: 0
             template:

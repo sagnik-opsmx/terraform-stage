@@ -2,13 +2,13 @@
   "artifactaccounts": [
     {
       "accountname": "my-artifact1",
-      "artifacttype": "Github",
-      "username": "OpsMx",
+      "artifacttype": "github",
+      "username": "lalitv92",
       "password": "pass!"
     },
     {
       "accountname": "my-artifact2",
-      "artifacttype": "Github",
+      "artifacttype": "s3",
       "username": "user",
       "password": "pwd"
     }
