@@ -1,4 +1,4 @@
-# Terraspin -- :whale:
+# Terraspin Job -- :whale:
 
 A microservice to integrate with Spinnaker for planning, applying and destroying Terraform plans
 [TerraSpin Docs](https://docs.opsmx.com/codelabs/terraform-spinnaker) 
