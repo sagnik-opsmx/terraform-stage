@@ -15,7 +15,7 @@ git clone https://github.com/OpsMx/terraform-stage.git
 
 Once cloning is done go inside spinterraservice-core directory run below command to build application 
 cmd- mvn clean install  
-After buliding maven will put jar in target folder of spinterra-core directory
+After buliding maven will put jar in target folder of spinterraservice-core directory
 
 # Running application
 To run microservice dial below command 
