@@ -1,0 +1,58 @@
+/*
+ * Copyright 2019 OpsMX, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.opsmx.terraspin.component;
+
+import java.io.File;
+
+import org.json.simple.parser.JSONParser;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ApplicationStartup implements ApplicationListener<ContextRefreshedEvent> {
+
+	/**
+	 * This method is called during Spring's startup.
+	 * 
+	 * @param event Event raised when an ApplicationContext gets initialized or
+	 *              refreshed.
+	 */
+	static final String separator = File.separator;
+	JSONParser parser = new JSONParser();
+
+	@Override
+	public void onApplicationEvent(final ContextRefreshedEvent event) {
+
+		/*
+		 * String currentComponent = System.getenv("component");
+		 * log.info("Given current Component -> " + currentComponent);
+		 * 
+		 * if(StringUtils.equalsIgnoreCase("plan", currentComponent)) { PlanComponent
+		 * planComponent = new PlanComponent(); planComponent.onTerraspinApply(); }
+		 * 
+		 * if(StringUtils.equalsIgnoreCase("apply", currentComponent)) { ApplyComponent
+		 * applyComponent = new ApplyComponent(); applyComponent.onTerraspinApply(); }
+		 * 
+		 * if(StringUtils.equalsIgnoreCase("destroy", currentComponent)) {
+		 * DestroyComponent destroyComponent = new DestroyComponent();
+		 * destroyComponent.onApplicationEvent(); }
+		 */
+
+	}
+
+}
