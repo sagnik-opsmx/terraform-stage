@@ -1,4 +1,4 @@
-# Terraspin -- :whale:
+# Terraspin Rest -- :whale:
 
 A microservice to integrate with Spinnaker for planning, applying and destroying Terraform plans
 [TerraSpin Docs](https://docs.opsmx.com/codelabs/terraform-spinnaker) 
@@ -13,7 +13,7 @@ we are using maven as build tool for buliding source code so maven 3 and uper ve
 Clone this repository 
 git clone https://github.com/OpsMx/terraform-stage.git
 
-Once cloning is done go inside spinterra-core directory run below command to build application 
+Once cloning is done go inside spinterraservice-core directory run below command to build application 
 cmd- mvn clean install  
 After buliding maven will put jar in target folder of spinterra-core directory
 
