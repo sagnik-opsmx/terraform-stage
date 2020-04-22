@@ -192,7 +192,6 @@ public class ZipUtil {
     }
 
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
 
 		String currentUserDir = System.getProperty("user.home");
 		System.out.println("---" + currentUserDir);

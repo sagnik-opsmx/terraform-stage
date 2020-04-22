@@ -66,7 +66,7 @@ public class TerraService {
 
 	@SuppressWarnings("unchecked")
 	public void planStart(JSONObject artifactconfigaccount, String variableOverrideFile, String spinPlan,
-			String spinArtifactAccount) {
+			String spinArtifactAccount, String artifactType) {
 
 		log.info("plan starting ::");
 		log.info("applicationName:" + applicationName);
@@ -84,7 +84,8 @@ public class TerraService {
 		InputStream statusInputStream = new ByteArrayInputStream(status.toString().getBytes(StandardCharsets.UTF_8));
 		terraAppUtil.overWriteStreamOnFile(statusFile, statusInputStream);
 
-		terraServicePlanSetting(artifactconfigaccount, spinArtifactAccount, spinPlan, currentTerraformInfraCodeDir);
+		terraServicePlanSetting(artifactconfigaccount, spinArtifactAccount, spinPlan, currentTerraformInfraCodeDir,
+				artifactType);
 
 		TerraformIntialInitThread terraInitialInitOperationCall = new TerraformIntialInitThread(
 				currentTerraformInfraCodeDir);
@@ -93,14 +94,11 @@ public class TerraService {
 		try {
 			trigger.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		String tfModuledir = findModuleRootDir();
+		String tfModuledir = findModuleRootDirAtPlan(artifactType);
 
-		// String exacttfRootModuleFilePathinStr = currentTerraformInfraCodeDir +
-		// fileSeparator + tfModuledir;
 		File exacttfRootModuleFilePathdir = new File(tfModuledir);
 
 		TerraformInitThread terraInitOperationCall = new TerraformInitThread(exacttfRootModuleFilePathdir);
@@ -109,7 +107,6 @@ public class TerraService {
 		try {
 			trigger1.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -124,7 +121,6 @@ public class TerraService {
 		try {
 			trigger2.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -183,13 +179,19 @@ public class TerraService {
 	}
 
 	public void terraServicePlanSetting(JSONObject artifactconfigaccount, String artifactAccount, String spinPlan,
-			File currentTerraformInfraCodeDir) {
+			File currentTerraformInfraCodeDir, String artifactType) {
 		String terraformInfraCode = null;
 
 		if (StringUtils.isNoneEmpty(artifactAccount)) {
-			String planConfig = new String("module \"terraModule\"{source = \"git::https://github.com/REPONAME\"}");
 
-			terraformInfraCode = planConfig.replaceAll("REPONAME", spinPlan);
+			if (StringUtils.equalsAnyIgnoreCase(artifactType, "S3")) {
+				String planConfig = new String("module \"terraModule\"{source = \"s3::https://REPONAME\"}");
+				terraformInfraCode = planConfig.replaceAll("REPONAME", spinPlan);
+			}
+			if (StringUtils.equalsAnyIgnoreCase(artifactType, "Github")) {
+				String planConfig = new String("module \"terraModule\"{source = \"git::https://github.com/REPONAME\"}");
+				terraformInfraCode = planConfig.replaceAll("REPONAME", spinPlan);
+			}
 
 		} else {
 			terraformInfraCode = spinPlan;
@@ -251,8 +253,6 @@ public class TerraService {
 
 		String tfModuledir = findModuleRootDir();
 
-		// String exacttfRootModuleFilePathinStr = currentTerraformInfraCodeDir + "/" +
-		// tfModuledir;
 		File exacttfRootModuleFilePathdir = new File(tfModuledir);
 
 		TerraformApplyThread terraOperationCall = new TerraformApplyThread(exacttfRootModuleFilePathdir, planPathDir,
@@ -263,7 +263,6 @@ public class TerraService {
 		try {
 			trigger.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -350,10 +349,14 @@ public class TerraService {
 				String value = tempLine.split("=", 2)[1].trim();
 				planExeOutputValuesJsonObj.put(key, value);
 				line = line + tempLine.trim() + System.lineSeparator();
-				System.out.println("SPINNAKER_PROPERTY_" + key + "=" + value);
+				if (StringUtils.isEmpty(key)) {
+					System.out.println("SPINNAKER_PROPERTY_" + "NoKey" + "=" + "NoValue");
+				} else {
+					System.out.println("SPINNAKER_PROPERTY_" + key + "=" + value);
+				}
 			}
 
-			BufferedReader reader2 = new BufferedReader(new InputStreamReader(exec.getInputStream()));
+			BufferedReader reader2 = new BufferedReader(new InputStreamReader(exec.getErrorStream()));
 			String line2 = "";
 			String tempLine2 = "";
 			while ((tempLine2 = reader2.readLine()) != null) {
@@ -362,8 +365,10 @@ public class TerraService {
 
 			reader.close();
 			reader2.close();
-			if (!line2.isEmpty())
+			if (!line2.isEmpty()) {
 				log.info("Error : terraform Plan script output values :" + line2);
+				System.out.println("SPINNAKER_PROPERTY_" + "NoKey" + "=" + "NoValue");
+			}
 		} catch (IOException | InterruptedException e) {
 			log.info("Error : terraform Plan script OutputValues  ouput");
 			throw new RuntimeException("Error : terraform Plan script OutputValues  ouput ", e);
@@ -506,6 +511,83 @@ public class TerraService {
 		}
 
 		String tfModuledir = currentTerraformInfraCodeDir + "/" + (String) correcttModule.get("Dir");
+		return tfModuledir;
+	}
+
+	@SuppressWarnings("unchecked")
+	public String findModuleRootDirAtPlan(String artifactType) {
+
+		String tfModuledir = "";
+		String currentTerraformInfraCodeDir = userHomeDir
+				+ "/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId";
+
+		if (StringUtils.equalsIgnoreCase(artifactType, "Github")) {
+			String tfModulejsonpath = currentTerraformInfraCodeDir + "/.terraform/modules/modules.json";
+			String tfModulejson = terraAppUtil.getStrJson(tfModulejsonpath);
+
+			JSONObject moduleConfigObject = null;
+			try {
+				moduleConfigObject = (JSONObject) parser.parse(tfModulejson);
+			} catch (ParseException pe) {
+				log.info("Exception while parsing  tf module json :: " + tfModulejson);
+				throw new RuntimeException("config Parse error:", pe);
+			}
+
+			JSONObject correcttModule = null;
+			JSONArray Modules = (JSONArray) moduleConfigObject.get("Modules");
+			for (int i = 0; i < Modules.size(); i++) {
+				JSONObject currentModule = (JSONObject) Modules.get(i);
+				String currentKey = (String) currentModule.get("Key");
+				if (StringUtils.equalsAnyIgnoreCase("terraModule", currentKey)) {
+					correcttModule = currentModule;
+					break;
+				}
+			}
+
+			tfModuledir = currentTerraformInfraCodeDir + "/" + (String) correcttModule.get("Dir");
+
+		}
+		if (StringUtils.equalsIgnoreCase(artifactType, "S3")) {
+
+			String tfModulejsonpath = currentTerraformInfraCodeDir + "/.terraform/modules/modules.json";
+			String tfModulejson = terraAppUtil.getStrJson(tfModulejsonpath);
+
+			JSONObject moduleConfigObject = new JSONObject();
+			JSONObject modifiedModuleConfigObject = new JSONObject();
+			try {
+				moduleConfigObject = (JSONObject) parser.parse(tfModulejson);
+			} catch (ParseException pe) {
+				log.info("Exception while parsing  tf module json :: " + tfModulejson);
+				throw new RuntimeException("config Parse error:", pe);
+			}
+
+			JSONObject correcttModule = null;
+			JSONArray Modules = (JSONArray) moduleConfigObject.get("Modules");
+			JSONArray ModifiedModules = new JSONArray();
+			for (int i = 0; i < Modules.size(); i++) {
+				JSONObject currentModule = (JSONObject) Modules.get(i);
+				ModifiedModules.add(currentModule);
+				String currentKey = (String) currentModule.get("Key");
+				if (StringUtils.equalsAnyIgnoreCase("terraModule", currentKey)) {
+					correcttModule = currentModule;
+					break;
+				}
+			}
+
+			tfModuledir = currentTerraformInfraCodeDir + "/" + (String) correcttModule.get("Dir");
+			String tfFilesDirName = terraAppUtil.getFirstDirNameInGivenDir(tfModuledir);
+			tfModuledir = tfModuledir + "/" + tfFilesDirName;
+
+			String exactCorrecttModuleDir = (String) correcttModule.get("Dir") + "/" + tfFilesDirName;
+			correcttModule.put("Dir", exactCorrecttModuleDir);
+			ModifiedModules.add(correcttModule);
+			modifiedModuleConfigObject.put("Modules", ModifiedModules);
+
+			File tfModulejsonFilepath = new File(tfModulejsonpath);
+			InputStream tfModifiedModulejsonInputStream = new ByteArrayInputStream(
+					modifiedModuleConfigObject.toString().getBytes(StandardCharsets.UTF_8));
+			terraAppUtil.overWriteStreamOnFile(tfModulejsonFilepath, tfModifiedModulejsonInputStream);
+		}
 		return tfModuledir;
 	}
 

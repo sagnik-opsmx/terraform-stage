@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.opsmx.terraspin.artifact.ArtifactProvider;
 import com.opsmx.terraspin.service.TerraService;
 import com.opsmx.terraspin.util.ProcessUtil;
 import com.opsmx.terraspin.util.TerraAppUtil;
@@ -152,11 +154,11 @@ public class DestroyComponent {
 				throw new RuntimeException("Payload parse error ", e);
 			}
 
-			String spinArtifactAccount = (String) payloadJsonObject.get("artifactAccount");
-			String spinPlan = (String) payloadJsonObject.get("plan");
-			String tfVariableOverrideFileRepo = (String) payloadJsonObject.get("variableOverrideFileRepo");
-			String spinStateRepo = (String) payloadJsonObject.get("stateRepo");
-			String uuId = (String) payloadJsonObject.get("uuId");
+			String spinArtifactAccount = payloadJsonObject.get("artifactAccount").toString().trim();
+			String spinPlan = payloadJsonObject.get("plan").toString().trim();
+			String tfVariableOverrideFileRepo = payloadJsonObject.get("variableOverrideFileRepo").toString().trim();
+			String spinStateRepo = payloadJsonObject.get("stateRepo").toString().trim();
+			String uuId = payloadJsonObject.get("uuId").toString().trim();
 
 			log.info("System info current user -> " + System.getProperty("user.name") + " & current dir -> "
 					+ System.getProperty("user.home"));
@@ -165,7 +167,7 @@ public class DestroyComponent {
 			log.info("Given override file path -> " + tfVariableOverrideFileRepo);
 			log.info("Given state repo -> " + spinStateRepo);
 			log.info("Given unique user id -> " + uuId);
-			log.info("Given current Component ->  Apply");
+			log.info("Given current Component ->  Destroy");
 
 			if (StringUtils.isEmpty(spinArtifactAccount)) {
 				log.error("Please specify artifact account it should'nt be blank or null.");
@@ -201,15 +203,14 @@ public class DestroyComponent {
 
 			for (int i = 0; i < artifactAccounts.size(); i++) {
 				artifactAccount = (JSONObject) artifactAccounts.get(i);
-				String githubArtifactaccountName = (String) artifactAccount.get("accountname");
-				if (StringUtils.equalsIgnoreCase(githubArtifactaccountName.trim(), spinArtifactAccount.trim()))
+				String githubArtifactaccountName = artifactAccount.get("accountname").toString().trim();
+				if (StringUtils.equalsIgnoreCase(githubArtifactaccountName, spinArtifactAccount))
 					break;
 			}
 
-			String artifactType = (String) artifactAccount.get("artifacttype");
+			String artifactType = artifactAccount.get("artifacttype").toString().trim();
 
-			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.component." + artifactType.trim()
-					+ "Provider";
+			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType + "Provider";
 
 			ArtifactProvider currentArtifactProviderObj = null;
 
@@ -230,16 +231,26 @@ public class DestroyComponent {
 			// String staterepoDirPath = currentUserDir + "/" + spinStateRepoName;
 			String staterepoDirPath = tfstatefilerepobasedir + fileSeparator + spinStateRepoName;
 
-			boolean isStateRepoGitcloned = currentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
-					spinStateRepoName, spinStateRepo);
-			if (isStateRepoGitcloned) {
+			boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
+					spinStateRepoName, spinStateRepo, uuId, "destroy");
+			if (isStateRepoCloned) {
 
-				String zipfilesrc = staterepoDirPath + "/" + uuId.trim() + ".zip";
+				String zipfilesrc = staterepoDirPath + fileSeparator + uuId + ".zip";
 
-				String extrapipelineidsrc = "/home/terraspin/extra/pipelineId-spinPipeId";
+				String extrapipelineidsrc = currentUserDir + fileSeparator + "extra" + fileSeparator
+						+ "pipelineId-spinPipeId";
+
 				File extrapipelineidsrcdir = new File(extrapipelineidsrc);
-				if (!extrapipelineidsrcdir.exists())
-					extrapipelineidsrcdir.mkdir();
+				if (!extrapipelineidsrcdir.exists()) {
+					extrapipelineidsrcdir.mkdirs();
+				} else {
+					try {
+						FileUtils.forceDelete(extrapipelineidsrcdir);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					extrapipelineidsrcdir.mkdirs();
+				}
 
 				try {
 					ziputil.unzip(zipfilesrc, extrapipelineidsrc);
@@ -257,7 +268,6 @@ public class DestroyComponent {
 					terraservice.destroyStart(extrapipelineidsrc, "", overrideVariableFilePath);
 				}
 
-				// JSONObject destroystatusobj = terraservice.destroyStatus("");
 				JSONObject destroystatusobj = getDestroyStatus(currentTerraformInfraCodeDir);
 				log.info("current destroystatusobj status :: " + destroystatusobj);
 				String destroystatusstr = (String) destroystatusobj.get("status");

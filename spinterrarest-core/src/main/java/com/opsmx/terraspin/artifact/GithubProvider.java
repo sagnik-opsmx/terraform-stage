@@ -1,4 +1,4 @@
-package com.opsmx.terraspin.component;
+package com.opsmx.terraspin.artifact;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import com.opsmx.terraspin.util.ZipUtil;
 
 public class GithubProvider extends ArtifactProvider {
 
-	private static final Logger log = LoggerFactory.getLogger(PlanComponent.class);
+	private static final Logger log = LoggerFactory.getLogger(GithubProvider.class);
 	private static final String fileSeparator = File.separator;
 	private static final String currentComponent = System.getenv("component");
 	private static final ProcessUtil processutil = new ProcessUtil();
@@ -23,7 +23,7 @@ public class GithubProvider extends ArtifactProvider {
 	private static final ZipUtil ziputil = new ZipUtil();
 
 	@Override
-	void envSetup(JSONObject artifactAccount) {
+	public void envSetup(JSONObject artifactAccount) {
 
 		log.info("started env setup of github");
 		String githubEnvUnhydratedCredentailsStr = "https://USER:PASS@github.com";
@@ -77,30 +77,29 @@ public class GithubProvider extends ArtifactProvider {
 	}
 
 	@Override
-	String getArtifactSourceReopName(String terraSpinStateRepoPath) {
+	public String getArtifactSourceReopName(String terraSpinStateRepoPath) {
 		String spinStateRepoNameWithUserName = terraSpinStateRepoPath.trim().split(".git")[0];
 		String spinStateRepoName = spinStateRepoNameWithUserName.trim().split("/")[1];
 		return spinStateRepoName;
 	}
 
-	String getArtifactSourceReopNameWithUsername(String terraSpinStateRepoPath) {
+	public String getArtifactSourceReopNameWithUsername(String terraSpinStateRepoPath) {
 		String spinStateRepoNameWithUserName = terraSpinStateRepoPath.trim().split(".git")[0];
-		return spinStateRepoNameWithUserName;
+		return spinStateRepoNameWithUserName + ".git";
 	}
 
 	@Override
-	String getOverrideFileNameWithPath(String tfVariableOverrideFileRepo) {
+	public String getOverrideFileNameWithPath(String tfVariableOverrideFileRepo) {
 		String VariableOverrideFilePath = tfVariableOverrideFileRepo.trim().split("//")[1];
 		return VariableOverrideFilePath;
 	}
 
 	@Override
-	boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername) {
+	public boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername) {
 		log.info("cloneOverrideFile repo name with user name -> " + tfVariableOverrideFileReopNameWithUsername);
 		String githubOverrideFileRepoCloneCommand = "git clone https://github.com/REPONAME";
 		githubOverrideFileRepoCloneCommand = githubOverrideFileRepoCloneCommand.replaceAll("REPONAME",
 				tfVariableOverrideFileReopNameWithUsername);
-		// delete first cloneOverrideFile repo dir if exist then do other process
 		String repodirname = tfVariableOverrideFileReopNameWithUsername.replace(".git", "").split("/")[1];
 		String OverrideVariableRepodir = cloneDir + fileSeparator + repodirname;
 		File OverrideVariableRepodirfile = new File(OverrideVariableRepodir);
@@ -109,7 +108,6 @@ public class GithubProvider extends ArtifactProvider {
 			try {
 				FileUtils.forceDelete(OverrideVariableRepodirfile);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -129,7 +127,7 @@ public class GithubProvider extends ArtifactProvider {
 	}
 
 	@Override
-	void pushStateArtifactSource(String currentUserDir, String spinStateRepoName, String staterepoDirPath,
+	public void pushStateArtifactSource(String currentUserDir, String spinStateRepoName, String staterepoDirPath,
 			String uuId) {
 
 		// String source2 =
@@ -211,14 +209,13 @@ public class GithubProvider extends ArtifactProvider {
 	}
 
 	@Override
-	boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName, String spinStateRepoNameWithUserName) {
+	public boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName, String spinStateRepoNameWithUserName, String uuId,String componentType) {
 
 		log.info("Repo name -> " + spinStateRepoName + " repo name with user name -> " + spinStateRepoNameWithUserName);
 		log.info("cloning dir path " + cloneDir);
 		String githubtfStateRepoCloneCommand = "git clone https://github.com/REPONAME";
 		githubtfStateRepoCloneCommand = githubtfStateRepoCloneCommand.replaceAll("REPONAME",
 				spinStateRepoNameWithUserName);
-		// delete first clone dir if exist then do other process
 
 		String StateRepodir = cloneDir + fileSeparator + spinStateRepoName;
 		File StateRepodirfile = new File(StateRepodir);
@@ -227,7 +224,6 @@ public class GithubProvider extends ArtifactProvider {
 			try {
 				FileUtils.forceDelete(StateRepodirfile);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

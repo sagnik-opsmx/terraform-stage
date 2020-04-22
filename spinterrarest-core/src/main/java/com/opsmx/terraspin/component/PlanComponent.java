@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.opsmx.terraspin.artifact.ArtifactProvider;
 import com.opsmx.terraspin.service.TerraService;
 import com.opsmx.terraspin.util.TerraAppUtil;
 
@@ -56,6 +58,12 @@ public class PlanComponent {
 
 		File currentTerraformInfraCodeDir = terraapputil.createDirForPipelineId(applicationName, pipelineName,
 				pipelineId);
+
+		try {
+			FileUtils.cleanDirectory(currentTerraformInfraCodeDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		writePlanStatus(currentTerraformInfraCodeDir, "RUNNING");
 
@@ -148,11 +156,11 @@ public class PlanComponent {
 				throw new RuntimeException("Payload parse error ", e);
 			}
 
-			String spinArtifactAccount = (String) payloadJsonObject.get("artifactAccount");
-			String spinPlan = (String) payloadJsonObject.get("plan");
-			String tfVariableOverrideFileRepo = (String) payloadJsonObject.get("variableOverrideFileRepo");
-			String spinStateRepo = (String) payloadJsonObject.get("stateRepo");
-			String uuId = (String) payloadJsonObject.get("uuId");
+			String spinArtifactAccount = payloadJsonObject.get("artifactAccount").toString().trim();
+			String spinPlan = payloadJsonObject.get("plan").toString().trim();
+			String tfVariableOverrideFileRepo = payloadJsonObject.get("variableOverrideFileRepo").toString().trim();
+			String spinStateRepo = payloadJsonObject.get("stateRepo").toString().trim();
+			String uuId = payloadJsonObject.get("uuId").toString().trim();
 
 			log.info("System info current user -> " + System.getProperty("user.name") + " & current dir -> "
 					+ System.getProperty("user.home"));
@@ -197,14 +205,14 @@ public class PlanComponent {
 
 			for (int i = 0; i < artifactAccounts.size(); i++) {
 				artifactAccount = (JSONObject) artifactAccounts.get(i);
-				String artifactaccountName = (String) artifactAccount.get("accountname");
-				if (StringUtils.equalsIgnoreCase(artifactaccountName.trim(), spinArtifactAccount.trim()))
+				String artifactaccountName = artifactAccount.get("accountname").toString().trim();
+				if (StringUtils.equalsIgnoreCase(artifactaccountName, spinArtifactAccount))
 					break;
 			}
 
-			String artifactType = (String) artifactAccount.get("artifacttype");
+			String artifactType = artifactAccount.get("artifacttype").toString().trim();
 
-			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.component." + artifactType.trim()
+			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType
 					+ "Provider";
 
 			ArtifactProvider currentArtifactProviderObj = null;
@@ -255,35 +263,35 @@ public class PlanComponent {
 
 				if (StringUtils.isEmpty(tfVariableOverrideFileRepo)) {
 					log.info("Terraform plan start without override file ");
-					terraservice.planStart(artifactAccount, null, spinPlan, spinArtifactAccount);
+					terraservice.planStart(artifactAccount, null, spinPlan, spinArtifactAccount, artifactType);
 				} else {
 					log.info("Terraform plan start with override file ");
-					String tfVariableOverrideFileReopNameWithUsername = currentArtifactProviderObj
-							.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo) + ".git";
 
-					boolean isOverrideVariableRepoGitcloned = currentArtifactProviderObj
+					String tfVariableOverrideFileReopNameWithUsername = currentArtifactProviderObj
+							.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo);
+
+					boolean isOverrideVariableRepoCloned = currentArtifactProviderObj
 							.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername);
-					if (isOverrideVariableRepoGitcloned) {
+					if (isOverrideVariableRepoCloned) {
 						String overrideVariableFilePath = overridefilerepobasedir + fileSeparator
 								+ tfVariableOverrideFileRepoName + fileSeparator + tfVariableOverrideFileName;
-						terraservice.planStart(artifactAccount, overrideVariableFilePath, spinPlan,
-								spinArtifactAccount);
+						terraservice.planStart(artifactAccount, overrideVariableFilePath, spinPlan, spinArtifactAccount,
+								artifactType);
 
 					} else {
 						log.info("error in cloning override variable file from artifact source");
 					}
 				}
 
-				// JSONObject planstatusobj = terraservice.planStatus("");
 				JSONObject planstatusobj = getPlanStatus(currentTerraformInfraCodeDir);
 				log.info("----- current plan status :: " + planstatusobj);
 				String planstatusstr = (String) planstatusobj.get("planstatus");
 
 				if (StringUtils.equalsIgnoreCase("SUCCESS", planstatusstr)) {
-					boolean isStateRepoGitcloned = currentArtifactProviderObj
-							.pullStateArtifactSource(tfstatefilerepobasedir, spinStateRepoName, spinStateRepo);
+					boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(
+							tfstatefilerepobasedir, spinStateRepoName, spinStateRepo, uuId, "plan");
 
-					if (isStateRepoGitcloned) {
+					if (isStateRepoCloned) {
 						currentArtifactProviderObj.pushStateArtifactSource(currentUserDir, spinStateRepoName,
 								staterepoDirPath, uuId);
 

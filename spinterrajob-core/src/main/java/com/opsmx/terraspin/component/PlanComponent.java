@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.opsmx.terraspin.artifact.ArtifactProvider;
 import com.opsmx.terraspin.service.TerraService;
 import com.opsmx.terraspin.util.TerraAppUtil;
 
@@ -46,12 +47,13 @@ public class PlanComponent {
 
 	public void onApplicationEvent() {
 
-		String currentUserDir = System.getProperty("user.home");
-		String spinArtifactAccount = System.getenv("artifactAccount");
-		String spinPlan = System.getenv("plan");
-		String tfVariableOverrideFileRepo = System.getenv("variableOverrideFileRepo");
-		String spinStateRepo = System.getenv("stateRepo");
-		String uuId = System.getenv("uuId");
+		String currentUserDir = System.getProperty("user.home").toString().trim();
+		String spinArtifactAccount = System.getenv("artifactAccount").toString().trim();
+		String spinPlan = System.getenv("plan").toString().trim();
+		String tfVariableOverrideFileRepo = System.getenv("variableOverrideFileRepo").toString().trim();
+		String spinStateRepo = System.getenv("stateRepo").toString().trim();
+		String uuId = System.getenv("uuId").toString().trim();
+		String currentComponent = System.getenv("component").toString().trim();
 
 		log.info("System info current user -> " + System.getProperty("user.name") + " & current dir -> "
 				+ System.getProperty("user.home"));
@@ -60,6 +62,7 @@ public class PlanComponent {
 		log.info("Given override file path -> " + tfVariableOverrideFileRepo);
 		log.info("Given state repo -> " + spinStateRepo);
 		log.info("Given unique user id -> " + uuId);
+		log.info("Given current Component -> " + currentComponent);
 
 		if (StringUtils.isEmpty(spinArtifactAccount)) {
 			log.error("Please specify artifact account it should'nt be blank or null.");
@@ -87,15 +90,14 @@ public class PlanComponent {
 
 		for (int i = 0; i < artifactAccounts.size(); i++) {
 			artifactAccount = (JSONObject) artifactAccounts.get(i);
-			String artifactaccountName = (String) artifactAccount.get("accountname");
-			if (StringUtils.equalsIgnoreCase(artifactaccountName.trim(), spinArtifactAccount.trim()))
+			String artifactaccountName = artifactAccount.get("accountname").toString().trim();
+			if (StringUtils.equalsIgnoreCase(artifactaccountName, spinArtifactAccount))
 				break;
 		}
 
-		String artifactType = (String) artifactAccount.get("artifacttype");
+		String artifactType = artifactAccount.get("artifacttype").toString().trim();
 
-		String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.component." + artifactType.trim()
-				+ "Provider";
+		String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.component." + artifactType	+ "Provider";
 
 		ArtifactProvider currentArtifactProviderObj = null;
 
@@ -145,18 +147,19 @@ public class PlanComponent {
 
 			if (StringUtils.isEmpty(tfVariableOverrideFileRepo)) {
 				log.info("Terraform plan start without override file ");
-				terraservice.planStart(artifactAccount, null);
+				terraservice.planStart(artifactAccount, null,artifactType);
 			} else {
 				log.info("Terraform plan start with override file ");
-				String tfVariableOverrideFileReopNameWithUsername = currentArtifactProviderObj
-						.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo) + ".git";
 
-				boolean isOverrideVariableRepoGitcloned = currentArtifactProviderObj
+				String tfVariableOverrideFileReopNameWithUsername = currentArtifactProviderObj
+						.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo);
+
+				boolean isOverrideVariableRepoCloned = currentArtifactProviderObj
 						.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername);
-				if (isOverrideVariableRepoGitcloned) {
+				if (isOverrideVariableRepoCloned) {
 					String overrideVariableFilePath = overridefilerepobasedir + fileSeparator
 							+ tfVariableOverrideFileRepoName + fileSeparator + tfVariableOverrideFileName;
-					terraservice.planStart(artifactAccount, overrideVariableFilePath);
+					terraservice.planStart(artifactAccount, overrideVariableFilePath, artifactType);
 
 				} else {
 					log.info("error in cloning override variable file from artifact source");
@@ -168,10 +171,10 @@ public class PlanComponent {
 			String planstatusstr = (String) planstatusobj.get("status");
 
 			if (StringUtils.equalsIgnoreCase("SUCCESS", planstatusstr)) {
-				boolean isStateRepoGitcloned = currentArtifactProviderObj
-						.pullStateArtifactSource(tfstatefilerepobasedir, spinStateRepoName, spinStateRepo);
+				boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(
+						tfstatefilerepobasedir, spinStateRepoName, spinStateRepo, uuId, "plan");
 
-				if (isStateRepoGitcloned) {
+				if (isStateRepoCloned) {
 					currentArtifactProviderObj.pushStateArtifactSource(currentUserDir, spinStateRepoName,
 							staterepoDirPath, uuId);
 

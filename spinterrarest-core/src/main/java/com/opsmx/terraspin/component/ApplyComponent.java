@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.opsmx.terraspin.artifact.ArtifactProvider;
 import com.opsmx.terraspin.service.TerraService;
 import com.opsmx.terraspin.util.ProcessUtil;
 import com.opsmx.terraspin.util.TerraAppUtil;
@@ -160,11 +162,11 @@ public class ApplyComponent {
 				throw new RuntimeException("Payload parse error ", e);
 			}
 
-			String spinArtifactAccount = (String) payloadJsonObject.get("artifactAccount");
-			String spinPlan = (String) payloadJsonObject.get("plan");
-			String tfVariableOverrideFileRepo = (String) payloadJsonObject.get("variableOverrideFileRepo");
-			String spinStateRepo = (String) payloadJsonObject.get("stateRepo");
-			String uuId = (String) payloadJsonObject.get("uuId");
+			String spinArtifactAccount = payloadJsonObject.get("artifactAccount").toString().trim();
+			String spinPlan = payloadJsonObject.get("plan").toString().trim();
+			String tfVariableOverrideFileRepo = payloadJsonObject.get("variableOverrideFileRepo").toString().trim();
+			String spinStateRepo = payloadJsonObject.get("stateRepo").toString().trim();
+			String uuId = payloadJsonObject.get("uuId").toString().trim();
 
 			log.info("System info current user -> " + System.getProperty("user.name") + " & current dir -> "
 					+ System.getProperty("user.home"));
@@ -198,14 +200,14 @@ public class ApplyComponent {
 
 			for (int i = 0; i < artifactAccounts.size(); i++) {
 				artifactAccount = (JSONObject) artifactAccounts.get(i);
-				String artifactaccountName = (String) artifactAccount.get("accountname");
-				if (StringUtils.equalsIgnoreCase(artifactaccountName.trim(), spinArtifactAccount.trim()))
+				String artifactaccountName = artifactAccount.get("accountname").toString().trim();
+				if (StringUtils.equalsIgnoreCase(artifactaccountName, spinArtifactAccount))
 					break;
 			}
 
 			String artifactType = (String) artifactAccount.get("artifacttype");
 
-			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.component." + artifactType.trim()
+			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType.trim()
 					+ "Provider";
 
 			ArtifactProvider currentArtifactProviderObj = null;
@@ -258,11 +260,12 @@ public class ApplyComponent {
 						.getOverrideFileNameWithPath(tfVariableOverrideFileRepo);
 
 				String tfVariableOverrideFileReopNameWithUsername = currentArtifactProviderObj
-						.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo) + ".git";
-				boolean isOverrideVariableRepoGitcloned = currentArtifactProviderObj
+						.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo);
+
+				boolean isOverrideVariableRepoCloned = currentArtifactProviderObj
 						.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername);
 
-				if (isOverrideVariableRepoGitcloned) {
+				if (isOverrideVariableRepoCloned) {
 					overrideVariableFilePath = overridefilerepobasedir + fileSeparator + tfVariableOverrideFileRepoName
 							+ fileSeparator + tfVariableOverrideFileName;
 				} else {
@@ -270,23 +273,30 @@ public class ApplyComponent {
 				}
 			}
 
-			boolean isStateRepoGitcloned = currentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
-					spinStateRepoName, spinStateRepo);
+			boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
+					spinStateRepoName, spinStateRepo, uuId, "apply");
 
-			if (isStateRepoGitcloned) {
+			if (isStateRepoCloned) {
 
-				// String zipfilesrc = staterepoDirPath + "/" + uuId.trim();
-				String zipfilesrc = staterepoDirPath + "/" + uuId.trim() + ".zip";
+				String zipfilesrc = staterepoDirPath + "/" + uuId + ".zip";
 
-				String extrapipelineidsrc = currentUserDir + fileSeparator + "extra/pipelineId-spinPipeId";
+				String extrapipelineidsrc = currentUserDir + fileSeparator + "extra" + fileSeparator
+						+ "pipelineId-spinPipeId";
 				File extrapipelineidsrcdir = new File(extrapipelineidsrc);
-				if (!extrapipelineidsrcdir.exists())
+				if (!extrapipelineidsrcdir.exists()) {
 					extrapipelineidsrcdir.mkdirs();
+				} else {
+					try {
+						FileUtils.forceDelete(extrapipelineidsrcdir);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					extrapipelineidsrcdir.mkdirs();
+				}
 
 				try {
 					ziputil.unzip(zipfilesrc, extrapipelineidsrc);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -300,7 +310,6 @@ public class ApplyComponent {
 					terraservice.applyStart(extrapipelineidsrc, "", overrideVariableFilePath);
 				}
 
-				// JSONObject applystatusobj = terraservice.applyStatus("");
 				JSONObject applystatusobj = getApplyStatus(currentTerraformInfraCodeDir);
 				log.info("Terraform apply status obj :: " + applystatusobj);
 				String applystatusstr = (String) applystatusobj.get("applystatus");

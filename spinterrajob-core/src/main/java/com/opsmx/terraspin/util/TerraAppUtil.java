@@ -19,6 +19,7 @@ package com.opsmx.terraspin.util;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +34,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -239,6 +241,18 @@ public class TerraAppUtil {
 		return contentBuilder.toString();
 	}
 	
+	public String getFirstDirNameInGivenDir(String givenDir) {
+		String tfDirName = "";
+		File directory = new File(givenDir);
+		File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
+		for (File dir : subdirs) {
+			System.out.println("Directory: " + dir.getName());
+			log.info("getFirstDirNameInGivenDir function call given dir : " + givenDir + " and firstDir is : " + dir.getName());
+			tfDirName = dir.getName();
+			
+		}
+		return tfDirName;
+	}
 	
 	public static void main(String... args) {}
 }
