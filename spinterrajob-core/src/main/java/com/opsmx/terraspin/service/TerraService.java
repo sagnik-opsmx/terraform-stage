@@ -66,8 +66,6 @@ public class TerraService {
 	String pipelineName = "pipelineName-" + spinPipelineName;
 	String pipelineId = "pipelineId-" + spinpiPelineId;
 
-	File exacttfRootModuleFilePathdir;
-
 	@SuppressWarnings("unchecked")
 	public void planStart(JSONObject artifactconfigaccount, String variableOverrideFile, String artifactType) {
 
@@ -298,6 +296,9 @@ public class TerraService {
 
 				String applyOutputURL = baseURL + "/api/v1/terraform/applyOutput/" + applicationName + "/"
 						+ pipelineName + "/" + pipelineId;
+				
+				String tfModuledir = findModuleRootDir();
+				File exacttfRootModuleFilePathdir = new File(tfModuledir);
 
 				JSONObject planExeOutputValuesObject = terraServicePlanExeOutputValues(exacttfRootModuleFilePathdir);
 
