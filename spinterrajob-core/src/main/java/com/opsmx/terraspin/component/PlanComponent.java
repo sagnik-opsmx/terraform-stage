@@ -97,7 +97,7 @@ public class PlanComponent {
 
 		String artifactType = artifactAccount.get("artifacttype").toString().trim();
 
-		String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.component." + artifactType	+ "Provider";
+		String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType	+ "Provider";
 
 		ArtifactProvider currentArtifactProviderObj = null;
 

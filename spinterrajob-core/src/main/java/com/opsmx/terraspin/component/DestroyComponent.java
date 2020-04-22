@@ -111,7 +111,7 @@ public class DestroyComponent {
 
 		String artifactType = artifactAccount.get("artifacttype").toString().trim();
 
-		String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.component." + artifactType
+		String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType
 				+ "Provider";
 
 		ArtifactProvider currentArtifactProviderObj = null;

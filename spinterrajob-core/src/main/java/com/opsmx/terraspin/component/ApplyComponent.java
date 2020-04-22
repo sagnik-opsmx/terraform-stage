@@ -109,7 +109,7 @@ public class ApplyComponent {
 
 		String artifactType = (String) artifactAccount.get("artifacttype");
 
-		String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.component." + artifactType.trim()
+		String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType.trim()
 				+ "Provider";
 
 		ArtifactProvider currentArtifactProviderObj = null;
