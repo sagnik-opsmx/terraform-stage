@@ -155,16 +155,12 @@ public class DestroyComponent {
 			}
 
 			String spinArtifactAccount = payloadJsonObject.get("artifactAccount").toString().trim();
-			String spinPlan = payloadJsonObject.get("plan").toString().trim();
-			String tfVariableOverrideFileRepo = payloadJsonObject.get("variableOverrideFileRepo").toString().trim();
 			String spinStateRepo = payloadJsonObject.get("stateRepo").toString().trim();
 			String uuId = payloadJsonObject.get("uuId").toString().trim();
 
 			log.info("System info current user -> " + System.getProperty("user.name") + " & current dir -> "
 					+ System.getProperty("user.home"));
-			log.info("Given terraform module path -> " + spinPlan);
 			log.info("Given artifact account name -> " + spinArtifactAccount);
-			log.info("Given override file path -> " + tfVariableOverrideFileRepo);
 			log.info("Given state repo -> " + spinStateRepo);
 			log.info("Given unique user id -> " + uuId);
 			log.info("Given current Component ->  Destroy");
@@ -210,7 +206,8 @@ public class DestroyComponent {
 
 			String artifactType = artifactAccount.get("artifacttype").toString().trim();
 
-			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType + "Provider";
+			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType
+					+ "Provider";
 
 			ArtifactProvider currentArtifactProviderObj = null;
 
@@ -255,18 +252,13 @@ public class DestroyComponent {
 				try {
 					ziputil.unzip(zipfilesrc, extrapipelineidsrc);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
 				boolean ischangemod = processutil.runcommand("chmod 777 -R ~/extra");
 				log.info("changing mod of file status :: " + ischangemod);
 
-				if (StringUtils.isEmpty(tfVariableOverrideFileRepo)) {
-					terraservice.destroyStart(extrapipelineidsrc, "", null);
-				} else {
-					terraservice.destroyStart(extrapipelineidsrc, "", overrideVariableFilePath);
-				}
+				terraservice.destroyStart(extrapipelineidsrc, "", overrideVariableFilePath);
 
 				JSONObject destroystatusobj = getDestroyStatus(currentTerraformInfraCodeDir);
 				log.info("current destroystatusobj status :: " + destroystatusobj);

@@ -62,7 +62,6 @@ public class ApplyComponent {
 
 		String currentUserDir = System.getProperty("user.home").toString().trim();
 		String spinArtifactAccount = System.getenv("artifactAccount").toString().trim();
-		String spinPlan = System.getenv("plan").toString().trim();
 		String tfVariableOverrideFileRepo = System.getenv("variableOverrideFileRepo").toString().trim();
 		String spinStateRepo = System.getenv("stateRepo").toString().trim();
 		String uuId = System.getenv("uuId").toString().trim();
@@ -70,7 +69,6 @@ public class ApplyComponent {
 
 		log.info("System info current user -> " + System.getProperty("user.name") + " & current dir -> "
 				+ System.getProperty("user.home"));
-		log.info("Given terraform module path -> " + spinPlan);
 		log.info("Given artifact account name -> " + spinArtifactAccount);
 		log.info("Given override file path -> " + tfVariableOverrideFileRepo);
 		log.info("Given state repo -> " + spinStateRepo);
