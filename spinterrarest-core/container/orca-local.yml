@@ -24,22 +24,27 @@ webhook:
       name: artifactaccount
       type: string
       description: pass your artifact account name.
+      defaultValue: ''
     - label: Terraform plan
       name: terraformplan
       type: string
       description: pass terraform module repo where your tf infra code present.
+      defaultValue: ''
     - label: Override file
       name: overridefile
       type: string
       description: pass overrideVariableFile path if you want to override default variables.
+      defaultValue: ''
     - label: State repo
       name: staterepo
       type: string
       description: pass overrideVariableFile path if you want to override variables.
+      defaultValue: ''
     - label: UUId
       name: uuid
       type: string
       description: pass unique user id.
+      defaultValue: ''
 
   - label: TSApplyRest
     type: TSApplyRestservice
@@ -64,18 +69,22 @@ webhook:
       name: artifactaccount
       type: string
       description: pass your artifact account name.
+      defaultValue: ''
     - label: Override file
       name: overridefile
       type: string
       description: pass overrideVariableFile path if you want to override default variables.
+      defaultValue: ''
     - label: State repo
       name: staterepo
       type: string
       description: pass overrideVariableFile path if you want to override variables.
+      defaultValue: ''
     - label: UUId
       name: uuid
       type: string
       description: pass unique user id.
+      defaultValue: ''
 
   - label: TSDestroyRest
     type: TSDestroyRestservice
@@ -99,13 +108,16 @@ webhook:
       name: artifactaccount
       type: string
       description: pass your artifact account name.
+      defaultValue: ''
     - label: State repo
       name: staterepo
       type: string
       description: pass overrideVariableFile path if you want to override variables.
+      defaultValue: ''
     - label: UUId
       name: uuid
       type: string
       description: pass unique user id.
+      defaultValue: ''
 
 
