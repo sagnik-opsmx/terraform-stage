@@ -69,7 +69,7 @@ job:
                         value: 
                       - name: component
                         value: plan
-                    image: 'docker.io/opsmx11/terraspin:2.0'
+                    image: 'docker.io/opsmx11/terraspinjob:3.0'
                     imagePullPolicy: Always
                     name: terraspinplan
                     volumeMounts:
@@ -144,7 +144,7 @@ job:
                         value: 
                       - name: component
                         value: apply
-                    image: 'docker.io/opsmx11/terraspin:2.0'
+                    image: 'docker.io/opsmx11/terraspinjob:3.0'
                     imagePullPolicy: Always
                     name: terraspinapply
                     volumeMounts:
@@ -211,7 +211,7 @@ job:
                         value: 
                       - name: component
                         value: destroy
-                    image: 'docker.io/opsmx11/terraspin:2.0'
+                    image: 'docker.io/opsmx11/terraspinjob:3.0'
                     imagePullPolicy: Always
                     name: terraspindestroy
                     volumeMounts:
