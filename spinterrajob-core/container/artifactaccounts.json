@@ -1,16 +1,17 @@
 {
   "artifactaccounts": [
     {
-      "accountname": "my-artifact1",
+      "accountname": "OpsMx-artifact-Github-account",
       "artifacttype": "Github",
-      "username": "OpsMx",
-      "password": "pass!"
+      "username": "acb-username",
+      "password": "abc-password"
     },
     {
-      "accountname": "my-artifact2",
-      "artifacttype": "Github",
-      "username": "user",
-      "password": "pwd"
+      "accountname": "OpsMx-artifact-S3-account",
+      "artifacttype": "S3",
+      "awsaccesskey": "abc-awsaccesskey",
+      "awssecretkey": "abc-awssecretkey",
+      "region": "abc-region"
     }
   ]
 }
