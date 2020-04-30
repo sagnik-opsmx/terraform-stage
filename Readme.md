@@ -2,18 +2,19 @@
 
 A microservice to integrate with Spinnaker for planning, applying and destroying Terraform plans
 
-Introduction
+### Introduction
 
-Purpose
+#### Purpose
 The purpose of this document is to describe the implementation of TerraSpin service, configuration and how it will work with spinnaker
 
-Abstract 
+#### Abstract
 TerraSpin service is microservice that performs Terraform action based on user call, current service is available in two architectures one is event-based and second is Rest API base both architecture services fulfill following operations of Terraform (Plan, Apply, output and destroy). Terraform output function will be a part of TerraSpin Apply function if the user terraform *.tf plan script contains output resources those outputs will be available in an apply API response or apply event response.
 
 The idea behind the implementation of this service to perform terraform function form Spinnaker as Spinnaker native stage, Spinnaker gives a way to create your custom native stage and we developed microservices as open-source which handles terraform operation like a plan, apply and destroy which easily integrate with a spinnaker in form of spinnaker Custom webhook and spinnaker Custom job with TerraSpin service
 
 ![alt text](https://github.com/OpsMx/terraform-stage/blob/master/TerraspinArch.png "Spinnaker and Terraspin configuration architecture")
 
+```
 Now let’s see dependency and input requirements for TerraSpin service while running the functionality.
 
 Dependency
@@ -60,3 +61,4 @@ s3-{region}.amazonaws.com/bucket/folder up to zip file  -- E.g. s3-us-west-2.ama
 ---------------------------------------------------
 
 4. UUID a unique user id as input in each TerraSpin functionality spinnaker pipeline stages based on uuid string will make zip file containing terraform intermediates state and push to state artifact source. This can be any unique string based on user choice to identify the terraform state across multiple stages. It is not mandatory to have all the stages(Plan, Apply, Destroy) in the same pipeline. However, they all should have the same UUID.
+```
