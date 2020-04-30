@@ -13,7 +13,7 @@ TerraSpin service is microservice that performs Terraform action based on user c
 The idea behind the implementation of this service to perform terraform function form Spinnaker as Spinnaker native stage, Spinnaker gives a way to create your custom native stage and we developed microservices as open-source which handles terraform operation like a plan, apply and destroy which easily integrate with a spinnaker in form of spinnaker Custom webhook and spinnaker Custom job with TerraSpin service
 
  Image                            :  
- ![alt text](https://github.com/OpsMx/terraform-stage/blob/master/TerraspinArch.png "Spinnaker and Terraspin configuration architecture")
+ ![alt text](<img align="center" src="https://github.com/OpsMx/terraform-stage/blob/master/TerraspinArch.png"> "Spinnaker and Terraspin configuration architecture")
 
 ```
 Now let’s see dependency and input requirements for TerraSpin service while running the functionality.
