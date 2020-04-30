@@ -38,7 +38,7 @@ In case of S3
 s3-{region}.amazonaws.com/bucket  -- E.g. s3-us-west-2.amazonaws.com/terraform-state
 ---------------------------------------------------
 
-2. Terraform plan script artifact source as input from where TerraSpin service will fetch terraform plan script and do operation based on user TerraSpin API call or event call.
+3. Terraform plan script artifact source as input from where TerraSpin service will fetch terraform plan script and do operation based on user TerraSpin API call or event call.
 
 Terraform plan script artifact source example
 ---------------------------------------------------
@@ -49,7 +49,7 @@ In case of S3
 s3-{region}.amazonaws.com/bucket/folder up to zip file  -- E.g. s3-us-west-2.amazonaws.com/terraform-module/Namespace..zip
 ---------------------------------------------------
 
-3. Override file (optional): as input in TerraSpin plan and apply functionality spinnaker pipeline stage If present, the file specified here will be applied on the root module. A possible use-case might be to provide a override tfvars file.
+4. Override file (optional): as input in TerraSpin plan and apply functionality spinnaker pipeline stage If present, the file specified here will be applied on the root module. A possible use-case might be to provide a override tfvars file.
 
 Override file source example
 ---------------------------------------------------
@@ -60,5 +60,6 @@ In case of S3
 s3-{region}.amazonaws.com/bucket/folder up to zip file  -- E.g. s3-us-west-2.amazonaws.com/terraform-dev-module/devlopment/dev.tfvars
 ---------------------------------------------------
 
-4. UUID a unique user id as input in each TerraSpin functionality spinnaker pipeline stages based on uuid string will make zip file containing terraform intermediates state and push to state artifact source. This can be any unique string based on user choice to identify the terraform state across multiple stages. It is not mandatory to have all the stages(Plan, Apply, Destroy) in the same pipeline. However, they all should have the same UUID.
+5. UUID a unique user id as input in each TerraSpin functionality spinnaker pipeline stages based on uuid string will make zip file containing terraform intermediates state and push to state artifact source. This can be.
+
 ```
