@@ -12,9 +12,9 @@ Abstract
 TerraSpin service is microservice that performs Terraform action based on user call, current service is available in two architectures one is event-based and second is Rest API base both architecture services fulfill following operations of Terraform (Plan, Apply, output and destroy). Terraform output function will be a part of TerraSpin Apply function if the user terraform *.tf plan script contains output resources those outputs will be available in an apply API response or apply event response.
 
 The idea behind the implementation of this service to perform terraform function form Spinnaker as Spinnaker native stage, Spinnaker gives a way to create your custom native stage and we developed microservices as open-source which handles terraform operation like a plan, apply and destroy which easily integrate with a spinnaker in form of spinnaker Custom webhook and spinnaker Custom job with TerraSpin service
-
+```
 ![alt text](https://github.com/OpsMx/terraform-stage/blob/master/TerraspinArch.png "Spinnaker and Terraspin configuration architecture")
-
+```
 Now let’s see dependency and input requirements for TerraSpin service while running the functionality.
 
 Dependency
