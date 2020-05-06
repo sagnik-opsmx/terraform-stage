@@ -1,8 +1,8 @@
 job:
   preconfigured:
-    kubernetes:      
+    kubernetes: 
       - label: TSPlanJob
-        application: terratest
+        application: test
         cloudProvider: kubernetes
         credentials: default
         description: Stage for terraspin plan operation
@@ -10,48 +10,50 @@ job:
         type: customTSPlanJobStage
         waitForCompletion: true
         parameters:
-          - defaultValue: >-
-              < artifact account name on which your terrafrom infracode present
-              >
+          - defaultValue: "ex1" 
             description: pass your artifact account name.
             label: Artifact account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Artifact account
-          - defaultValue: < artifact path where terraform infracode present >
+          - defaultValue: "ex2" 
             description: pass terraform module repo where your tf infra code present.
             label: Terraform plan
             mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
             name: Terraform plan
-          - defaultValue: < artifact override file path for overriding default values >
+          - defaultValue: "ex3" 
             description: pass overrideVariableFile path if you want to override variables.
             label: Override file
             mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
             name: Override file
-          - defaultValue: >-
-              < specify repo name on which you want to store states of terraform
-              plan, apply and destroy >
+          - defaultValue: "ex4" 
             description: >-
               pass repo name where you want to save intermediate state of
               terraform state.
             label: State repo
             mapping: 'manifest.spec.template.spec.containers[0].env[3].value'
             name: State repo
-          - defaultValue: >-
-              < Unique string, give the same string in the plan, apply and
-              destroy stages >
+          - defaultValue: "ex5" 
             description: pass unique user id.
             label: UUId
             mapping: 'manifest.spec.template.spec.containers[0].env[4].value'
             name: UUId
+          - defaultValue: "ex6" 
+            description: pass custom k8Anotation to be add at pod level object.
+            label: "iam.amazonaws.com/role"
+            mapping: "manifest.spec.template.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
+            name: "k8Anotation"
         manifest:
           apiVersion: batch/v1
           kind: Job
           metadata:
             name: terraspinplanjob
-            namespace: spin
+            namespace: spinterra
           spec:
             backoffLimit: 0
             template:
+              metadata:
+                annotations:
+                  "[iam.amazonaws.com/role]":
               spec:
                 containers:
                   - command:
@@ -80,10 +82,8 @@ job:
                   - configMap:
                       name: terraspinbackendconfig
                     name: opsmx-terraspin-backend-config
-
-
       - label: TSApplyJob
-        application: terratest
+        application: test
         cloudProvider: kubernetes
         credentials: default
         description: Stage for terraspin apply operation
@@ -92,30 +92,24 @@ job:
         type: customTSApplyJobStage
         waitForCompletion: true
         parameters:
-          - defaultValue: >-
-              < artifact account name on which your terrafrom infracode present
-              >
+          - defaultValue: "ex1" 
             description: pass git account name.
             label: Artifact account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Artifact account
-          - defaultValue: < artifact override file path for overriding default values >
+          - defaultValue: "ex2" 
             description: pass overrideVariableFile path if you want to override variables.
             label: Override file
             mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
             name: Override file
-          - defaultValue: >-
-              < specify repo name on which you want to store states of terraform
-              plan, apply and destroy >
+          - defaultValue: "ex3" 
             description: >-
               pass repo name where you want to save intermediate state of
               terraform state.
             label: State repo
             mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
             name: State repo
-          - defaultValue: >-
-              < Unique string, give the same string in the plan, apply and
-              destroy stages >
+          - defaultValue: "ex4" 
             description: pass unique user id.
             label: UUId
             mapping: 'manifest.spec.template.spec.containers[0].env[3].value'
@@ -125,7 +119,7 @@ job:
           kind: Job
           metadata:
             name: terraspinapplyjob
-            namespace: spin
+            namespace: spinterra
           spec:
             backoffLimit: 0
             template:
@@ -155,10 +149,8 @@ job:
                   - configMap:
                       name: terraspinbackendconfig
                     name: opsmx-terraspin-backend-config
-
-
       - label: TSDestroyJob
-        application: terratest
+        application: test
         cloudProvider: kubernetes
         credentials: default
         description: Stage for terraspin destroy operation
@@ -166,25 +158,19 @@ job:
         type: customTSDestroyJobStage
         waitForCompletion: true
         parameters:
-          - defaultValue: >-
-              < artifact account name on which your terraform infracode present
-              >
+          - defaultValue: "ex1" 
             description: pass git account name.
             label: Artifact account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Artifact account
-          - defaultValue: >-
-              < specify repo name on which you want to store states of terraform
-              plan, apply and destroy >
+          - defaultValue: "ex2" 
             description: >-
               pass repo name where you want to save intermediate state of
               terraform state.
             label: State repo
             mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
             name: State repo
-          - defaultValue: >-
-              < Unique string, give the same string in the plan, apply and
-              destroy stages >
+          - defaultValue: "ex3" 
             description: pass unique user id.
             label: UUID
             mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
@@ -194,7 +180,7 @@ job:
           kind: Job
           metadata:
             name: terraspindestroyjob
-            namespace: spin
+            namespace: spinterra
           spec:
             backoffLimit: 0
             template:
