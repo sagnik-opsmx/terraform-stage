@@ -41,7 +41,7 @@ job:
             description: pass custom k8Anotation to be add at pod level object.
             label: "iam.amazonaws.com/role"
             mapping: "manifest.spec.template.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
-            name: "k8Anotation"
+            name: "k8annotation"
         manifest:
           apiVersion: batch/v1
           kind: Job
