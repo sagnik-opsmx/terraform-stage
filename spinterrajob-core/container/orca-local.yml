@@ -2,45 +2,43 @@ job:
   preconfigured:
     kubernetes: 
       - label: TSPlanJob
-        application: test
         cloudProvider: kubernetes
         credentials: default
+        application: opsmx
         description: Stage for terraspin plan operation
         account: default
         type: customTSPlanJobStage
         waitForCompletion: true
         parameters:
-          - defaultValue: "ex1" 
-            description: pass your artifact account name.
+          - defaultValue: "" 
+            description: Please enter the artifact account name from artifactsaccounts.json.
             label: Artifact account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Artifact account
-          - defaultValue: "ex2" 
-            description: pass terraform module repo where your tf infra code present.
+          - defaultValue: "" 
+            description: Please enter terraform module repo where the code is present.
             label: Terraform plan
             mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
             name: Terraform plan
-          - defaultValue: "ex3" 
-            description: pass overrideVariableFile path if you want to override variables.
+          - defaultValue: "" 
+            description: Please enter overrideVariableFile path if you want to override variables.
             label: Override file
             mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
             name: Override file
-          - defaultValue: "ex4" 
-            description: >-
-              pass repo name where you want to save intermediate state of
-              terraform state.
+          - defaultValue: "" 
+            description: Please enter the repo name where you want to save terraform intermediate state.
             label: State repo
             mapping: 'manifest.spec.template.spec.containers[0].env[3].value'
             name: State repo
-          - defaultValue: "ex5" 
-            description: pass unique user id.
+          - defaultValue: "" 
+            description: Please enter a unique id to identify the terraform state.
             label: UUId
             mapping: 'manifest.spec.template.spec.containers[0].env[4].value'
             name: UUId
-          - defaultValue: "ex6" 
-            description: pass custom k8Anotation to be add at pod level object.
+          - defaultValue: "" 
+            description: Please enter AWS IAM role name.
             label: "iam.amazonaws.com/role"
-            mapping: "manifest.spec.template.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
+            mapping: "manifest.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
             name: "k8annotation"
         manifest:
           apiVersion: batch/v1
@@ -83,7 +81,7 @@ job:
                       name: terraspinbackendconfig
                     name: opsmx-terraspin-backend-config
       - label: TSApplyJob
-        application: test
+        application: opsmx
         cloudProvider: kubernetes
         credentials: default
         description: Stage for terraspin apply operation
@@ -92,28 +90,31 @@ job:
         type: customTSApplyJobStage
         waitForCompletion: true
         parameters:
-          - defaultValue: "ex1" 
-            description: pass git account name.
+          - defaultValue: "" 
+            description: Please enter the artifact account name from artifactsaccounts.json.
             label: Artifact account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Artifact account
-          - defaultValue: "ex2" 
-            description: pass overrideVariableFile path if you want to override variables.
+          - defaultValue: "" 
+            description: Please enter overrideVariableFile path if you want to override variables.
             label: Override file
             mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
             name: Override file
-          - defaultValue: "ex3" 
-            description: >-
-              pass repo name where you want to save intermediate state of
-              terraform state.
+          - defaultValue: "" 
+            description: Please enter the repo name where you want to save terraform intermediate state.
             label: State repo
             mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
             name: State repo
-          - defaultValue: "ex4" 
-            description: pass unique user id.
+          - defaultValue: "" 
+            description: Please enter a unique id to identify the terraform state.
             label: UUId
             mapping: 'manifest.spec.template.spec.containers[0].env[3].value'
             name: UUId
+          - defaultValue: "" 
+            description: Please enter AWS IAM role name.
+            label: "iam.amazonaws.com/role"
+            mapping: "manifest.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
+            name: "k8annotation"
         manifest:
           apiVersion: batch/v1
           kind: Job
@@ -123,6 +124,9 @@ job:
           spec:
             backoffLimit: 0
             template:
+              metadata:
+                annotations:
+                  "[iam.amazonaws.com/role]":
               spec:
                 containers:
                   - command:
@@ -150,7 +154,7 @@ job:
                       name: terraspinbackendconfig
                     name: opsmx-terraspin-backend-config
       - label: TSDestroyJob
-        application: test
+        application: opsmx
         cloudProvider: kubernetes
         credentials: default
         description: Stage for terraspin destroy operation
@@ -158,23 +162,26 @@ job:
         type: customTSDestroyJobStage
         waitForCompletion: true
         parameters:
-          - defaultValue: "ex1" 
-            description: pass git account name.
+          - defaultValue: "" 
+            description: Please enter the artifact account name from artifactsaccounts.json.
             label: Artifact account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Artifact account
-          - defaultValue: "ex2" 
-            description: >-
-              pass repo name where you want to save intermediate state of
-              terraform state.
+          - defaultValue: "" 
+            description: Please enter the repo name where you want to save terraform intermediate state.
             label: State repo
             mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
             name: State repo
-          - defaultValue: "ex3" 
-            description: pass unique user id.
+          - defaultValue: "" 
+            description: Please enter a unique id to identify the terraform state.
             label: UUID
             mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
             name: UUID
+          - defaultValue: "" 
+            description: Please enter AWS IAM role name.
+            label: "iam.amazonaws.com/role"
+            mapping: "manifest.spec.template.metadata.annotations.'iam.amazonaws.com/role'"
+            name: "k8annotation"
         manifest:
           apiVersion: batch/v1
           kind: Job
@@ -184,6 +191,9 @@ job:
           spec:
             backoffLimit: 0
             template:
+              metadata:
+                annotations:
+                  "[iam.amazonaws.com/role]":
               spec:
                 containers:
                   - command:
