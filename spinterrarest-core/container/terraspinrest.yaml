@@ -15,7 +15,7 @@ spec:
         app: terraspinrestapp
     spec:
       containers:
-        - image: 'docker.io/opsmx11/terraspinrest:3.0'
+        - image: 'docker.io/opsmx11/terraspinrest:4.0'
           imagePullPolicy: Always
           name: terraspinrest
           ports:
