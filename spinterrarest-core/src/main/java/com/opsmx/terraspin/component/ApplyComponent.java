@@ -261,7 +261,7 @@ public class ApplyComponent {
 						.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo);
 
 				boolean isOverrideVariableRepoCloned = currentArtifactProviderObj
-						.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername);
+						.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername, artifactAccount);
 
 				if (isOverrideVariableRepoCloned) {
 					overrideVariableFilePath = overridefilerepobasedir + fileSeparator + tfVariableOverrideFileRepoName
@@ -272,7 +272,7 @@ public class ApplyComponent {
 			}
 
 			boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
-					spinStateRepoName, spinStateRepo, uuId, "apply");
+					spinStateRepoName, spinStateRepo, uuId, "apply", artifactAccount);
 
 			if (isStateRepoCloned) {
 

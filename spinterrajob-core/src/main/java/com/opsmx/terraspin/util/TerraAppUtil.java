@@ -98,6 +98,10 @@ public class TerraAppUtil {
 		boolean append = true;
 		boolean autoFlush = true;
 		String charset = "UTF-8";
+		
+		file.setExecutable(true);
+		file.setWritable(true);
+		file.setReadable(true);
 
 		FileOutputStream fos;
 		OutputStreamWriter osw;
@@ -127,6 +131,10 @@ public class TerraAppUtil {
 		boolean append = false;
 		boolean autoFlush = true;
 		String charset = "UTF-8";
+		
+		file.setExecutable(true);
+		file.setWritable(true);
+		file.setReadable(true);
 
 		FileOutputStream fos;
 		OutputStreamWriter osw;

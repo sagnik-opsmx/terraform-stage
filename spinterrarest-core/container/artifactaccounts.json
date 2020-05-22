@@ -3,7 +3,15 @@
     {
       "accountname": "OpsMx-artifact-Github-account",
       "artifacttype": "Github",
-      "username": "acb-username",
+      "host": "https://github.com",
+      "username": "abc-username",
+      "password": "abc-password"
+    },
+    {
+      "accountname": "OpsMx-artifact-Bitbucket-account",
+      "artifacttype": "Bitbucket",
+      "host": "https://bitbucket.org",
+      "username": "abc-username",
       "password": "abc-password"
     },
     {

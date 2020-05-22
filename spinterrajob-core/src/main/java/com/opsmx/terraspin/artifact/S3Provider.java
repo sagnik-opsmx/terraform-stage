@@ -99,7 +99,7 @@ public class S3Provider extends ArtifactProvider {
 	}
 
 	@Override
-	public boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername) {
+	public boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername, JSONObject artifactAccount) {
 
 		log.info("cloneOverrideFile form S3 bucket following bucket uri are -> "
 				+ tfVariableOverrideFileReopNameWithUsername);
@@ -191,7 +191,7 @@ public class S3Provider extends ArtifactProvider {
 
 	@Override
 	public boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName,
-			String spinStateRepoNameWithUserName, String uuId, String componentType) {
+			String spinStateRepoNameWithUserName, String uuId, String componentType, JSONObject artifactAccount) {
 
 		log.info("cloneStateFile form S3 bucket following bucket uri are -> " + spinStateRepoNameWithUserName);
 		String stateFileBucketName = spinStateRepoName.trim();

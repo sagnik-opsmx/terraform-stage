@@ -13,9 +13,9 @@ import com.opsmx.terraspin.util.ProcessUtil;
 import com.opsmx.terraspin.util.TerraAppUtil;
 import com.opsmx.terraspin.util.ZipUtil;
 
-public class GithubProvider extends ArtifactProvider {
+public class BitbucketProvider extends ArtifactProvider {
 
-	private static final Logger log = LoggerFactory.getLogger(GithubProvider.class);
+	private static final Logger log = LoggerFactory.getLogger(BitbucketProvider.class);
 	private static final String fileSeparator = File.separator;
 	private static final String currentComponent = System.getenv("component");
 	private static final ProcessUtil processutil = new ProcessUtil();
@@ -25,7 +25,8 @@ public class GithubProvider extends ArtifactProvider {
 	@Override
 	public void envSetup(JSONObject artifactAccount) {
 
-		log.info("started env setup of github");
+		log.info("started env setup of bitbucket");
+		
 		String user = (String) artifactAccount.get("username");
 		String pass = (String) artifactAccount.get("password");
 		String artifactHost = artifactAccount.get("host").toString().trim();
@@ -76,7 +77,7 @@ public class GithubProvider extends ArtifactProvider {
 		log.info("isgitcredentialHelpercommandsuccess got success " + isgitcredentialHelpercommandsuccess
 				+ " and process obj status " + processutil.getStatusRootObj());
 
-		log.info("finish env setup of github");
+		log.info("finish env setup of bitbucket");
 	}
 
 	@Override
@@ -100,10 +101,9 @@ public class GithubProvider extends ArtifactProvider {
 	@Override
 	public boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername, JSONObject artifactAccount) {
 		log.info("cloneOverrideFile repo name with user name -> " + tfVariableOverrideFileReopNameWithUsername);
-		//String githubOverrideFileRepoCloneCommand = "git clone https://github.com/REPONAME";
 		String artifactHost = artifactAccount.get("host").toString().trim();
-		String githubOverrideFileRepoCloneCommand = "git clone "  + artifactHost +"/REPONAME";
-		githubOverrideFileRepoCloneCommand = githubOverrideFileRepoCloneCommand.replaceAll("REPONAME",
+		String bitbucketOverrideFileRepoCloneCommand = "git clone "  + artifactHost +"/REPONAME";
+		bitbucketOverrideFileRepoCloneCommand = bitbucketOverrideFileRepoCloneCommand.replaceAll("REPONAME",
 				tfVariableOverrideFileReopNameWithUsername);
 		// delete first cloneOverrideFile repo dir if exist then do other process
 		String repodirname = tfVariableOverrideFileReopNameWithUsername.replace(".git", "").split("/")[1];
@@ -119,7 +119,7 @@ public class GithubProvider extends ArtifactProvider {
 			}
 		}
 
-		boolean isOverrideVariableRepoGitcloned = processutil.runcommandwithindir(githubOverrideFileRepoCloneCommand,
+		boolean isOverrideVariableRepoGitcloned = processutil.runcommandwithindir(bitbucketOverrideFileRepoCloneCommand,
 				cloneDir);
 
 		if (isOverrideVariableRepoGitcloned) {
@@ -216,14 +216,15 @@ public class GithubProvider extends ArtifactProvider {
 	}
 
 	@Override
-	public boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName, String spinStateRepoNameWithUserName, String uuId, String componentType, JSONObject artifactAccount) {
+	public boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName, String spinStateRepoNameWithUserName, String uuId,String componentType, JSONObject artifactAccount) {
 
 		log.info("Repo name -> " + spinStateRepoName + " repo name with user name -> " + spinStateRepoNameWithUserName);
 		log.info("cloning dir path " + cloneDir);
-		//String githubtfStateRepoCloneCommand = "git clone https://github.com/REPONAME";
+
+		//String githubtfStateRepoCloneCommand = "git clone https://bitbucket.org/REPONAME";
 		String artifactHost = artifactAccount.get("host").toString().trim();
-		String githubtfStateRepoCloneCommand = "git clone "  + artifactHost +"/REPONAME";
-		githubtfStateRepoCloneCommand = githubtfStateRepoCloneCommand.replaceAll("REPONAME",
+		String bitbuckettfStateRepoCloneCommand = "git clone "  + artifactHost +"/REPONAME";
+		bitbuckettfStateRepoCloneCommand = bitbuckettfStateRepoCloneCommand.replaceAll("REPONAME",
 				spinStateRepoNameWithUserName);
 		// delete first clone dir if exist then do other process
 
@@ -239,7 +240,7 @@ public class GithubProvider extends ArtifactProvider {
 			}
 		}
 
-		boolean isStateRepoGitcloned = processutil.runcommandwithindir(githubtfStateRepoCloneCommand, cloneDir);
+		boolean isStateRepoGitcloned = processutil.runcommandwithindir(bitbuckettfStateRepoCloneCommand, cloneDir);
 		log.info("is current repo : " + spinStateRepoNameWithUserName + ". is cloned sucessfully : "
 				+ isStateRepoGitcloned + " and process obj status " + processutil.getStatusRootObj());
 

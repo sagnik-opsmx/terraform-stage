@@ -26,9 +26,12 @@ public class GithubProvider extends ArtifactProvider {
 	public void envSetup(JSONObject artifactAccount) {
 
 		log.info("started env setup of github");
-		String githubEnvUnhydratedCredentailsStr = "https://USER:PASS@github.com";
 		String user = (String) artifactAccount.get("username");
 		String pass = (String) artifactAccount.get("password");
+		String artifactHost = artifactAccount.get("host").toString().trim();
+		String httpType = artifactHost.split("//")[0];
+		String httpSocket = artifactHost.split("//")[1];
+		String githubEnvUnhydratedCredentailsStr = httpType + "//USER:PASS@" + httpSocket;
 		String githubEnvHydratedCredentailsStr = githubEnvUnhydratedCredentailsStr.replaceAll("USER", user)
 				.replaceAll("PASS", pass);
 		String currentUserDir = System.getProperty("user.home");
@@ -95,9 +98,10 @@ public class GithubProvider extends ArtifactProvider {
 	}
 
 	@Override
-	public boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername) {
+	public boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername, JSONObject artifactAccount) {
 		log.info("cloneOverrideFile repo name with user name -> " + tfVariableOverrideFileReopNameWithUsername);
-		String githubOverrideFileRepoCloneCommand = "git clone https://github.com/REPONAME";
+		String artifactHost = artifactAccount.get("host").toString().trim();
+		String githubOverrideFileRepoCloneCommand = "git clone "  + artifactHost +"/REPONAME";
 		githubOverrideFileRepoCloneCommand = githubOverrideFileRepoCloneCommand.replaceAll("REPONAME",
 				tfVariableOverrideFileReopNameWithUsername);
 		String repodirname = tfVariableOverrideFileReopNameWithUsername.replace(".git", "").split("/")[1];
@@ -209,11 +213,12 @@ public class GithubProvider extends ArtifactProvider {
 	}
 
 	@Override
-	public boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName, String spinStateRepoNameWithUserName, String uuId,String componentType) {
+	public boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName, String spinStateRepoNameWithUserName, String uuId,String componentType, JSONObject artifactAccount) {
 
 		log.info("Repo name -> " + spinStateRepoName + " repo name with user name -> " + spinStateRepoNameWithUserName);
 		log.info("cloning dir path " + cloneDir);
-		String githubtfStateRepoCloneCommand = "git clone https://github.com/REPONAME";
+		String artifactHost = artifactAccount.get("host").toString().trim();
+		String githubtfStateRepoCloneCommand = "git clone "  + artifactHost +"/REPONAME";
 		githubtfStateRepoCloneCommand = githubtfStateRepoCloneCommand.replaceAll("REPONAME",
 				spinStateRepoNameWithUserName);
 

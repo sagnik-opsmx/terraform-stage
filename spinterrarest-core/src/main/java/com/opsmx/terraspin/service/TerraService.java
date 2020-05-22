@@ -189,7 +189,13 @@ public class TerraService {
 				terraformInfraCode = planConfig.replaceAll("REPONAME", spinPlan);
 			}
 			if (StringUtils.equalsAnyIgnoreCase(artifactType, "Github")) {
-				String planConfig = new String("module \"terraModule\"{source = \"git::https://github.com/REPONAME\"}");
+				String artifactHost = artifactconfigaccount.get("host").toString().trim();
+				String planConfig = new String("module \"terraModule\"{source = \"git::" + artifactHost+ "/REPONAME\"}");
+				terraformInfraCode = planConfig.replaceAll("REPONAME", spinPlan);
+			}
+			if (StringUtils.equalsAnyIgnoreCase(artifactType, "Bitbucket")) {
+				String artifactHost = artifactconfigaccount.get("host").toString().trim();
+				String planConfig = new String("module \"terraModule\"{source = \"git::" + artifactHost+ "/REPONAME\"}");
 				terraformInfraCode = planConfig.replaceAll("REPONAME", spinPlan);
 			}
 
@@ -521,7 +527,7 @@ public class TerraService {
 		String currentTerraformInfraCodeDir = userHomeDir
 				+ "/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId";
 
-		if (StringUtils.equalsIgnoreCase(artifactType, "Github")) {
+		if (StringUtils.equalsIgnoreCase(artifactType, "Github") || StringUtils.equalsIgnoreCase(artifactType, "Bitbucket")) {
 			String tfModulejsonpath = currentTerraformInfraCodeDir + "/.terraform/modules/modules.json";
 			String tfModulejson = terraAppUtil.getStrJson(tfModulejsonpath);
 

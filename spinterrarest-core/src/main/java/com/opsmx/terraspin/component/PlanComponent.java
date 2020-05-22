@@ -271,7 +271,7 @@ public class PlanComponent {
 							.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo);
 
 					boolean isOverrideVariableRepoCloned = currentArtifactProviderObj
-							.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername);
+							.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername, artifactAccount);
 					if (isOverrideVariableRepoCloned) {
 						String overrideVariableFilePath = overridefilerepobasedir + fileSeparator
 								+ tfVariableOverrideFileRepoName + fileSeparator + tfVariableOverrideFileName;
@@ -289,7 +289,7 @@ public class PlanComponent {
 
 				if (StringUtils.equalsIgnoreCase("SUCCESS", planstatusstr)) {
 					boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(
-							tfstatefilerepobasedir, spinStateRepoName, spinStateRepo, uuId, "plan");
+							tfstatefilerepobasedir, spinStateRepoName, spinStateRepo, uuId, "plan", artifactAccount);
 
 					if (isStateRepoCloned) {
 						currentArtifactProviderObj.pushStateArtifactSource(currentUserDir, spinStateRepoName,

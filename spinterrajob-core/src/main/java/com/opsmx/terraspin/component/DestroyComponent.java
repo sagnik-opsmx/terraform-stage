@@ -129,7 +129,7 @@ public class DestroyComponent {
 		String staterepoDirPath = tfstatefilerepobasedir + fileSeparator + spinStateRepoName;
 
 		boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
-				spinStateRepoName, spinStateRepo, uuId, "destroy");
+				spinStateRepoName, spinStateRepo, uuId, "destroy", artifactAccount);
 		if (isStateRepoCloned) {
 
 			String zipfilesrc = staterepoDirPath + fileSeparator + uuId.trim() + ".zip";
