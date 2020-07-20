@@ -1,22 +1,41 @@
 #!/bin/bash
 
-#nohup java -Dspring.config.location=/home/terraspin/opsmx/app/config/application.properties  -jar /home/terraspin/artifact/TerraSpin.jar > /home/terraspin/artifact/terraspin.log 2>&1 &
+echo -e "Executing Terraform Apply ...."
+java -jar /home/terraspin/artifact/TerraSpin.jar 2>&1 > /home/terraspin/artifact/terraspin.log
+RETURN_CODE=$?
 
-#java -jar /home/terraspin/artifact/TerraSpin.jar --application.iscontainer.env=true
-java -jar /home/terraspin/artifact/TerraSpin.jar
+if [ $RETURN_CODE -eq 0 ]; then
 
-
-#  For Debugging, Docker should alive! Uncommment while portation to keep containe live
-#while :; do echo '*print*'; sleep 5; done
-
-if [ $? -eq 0 ]; then
+    echo -e "Terraform Apply Execution completed Successfully"
     echo -e '\n\n \t\t ================================ Terraform Apply Output ====================================== \t\t\n\n'
-    jq .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/applyStatus | xargs -0 echo -e
-    #while :; do echo '*print*'; sleep 5; done
-    exit 0    
+
+    APPLYSTATUS=`jq -r .status /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/applyStatus | tr -d '\n'`
+
+    echo -e 'Terraform Apply Status:' $APPLYSTATUS "\n"
+
+    if [ $APPLYSTATUS != "SUCCESS" ]; then
+	echo -e "Failed while executing Terraform Apply stage\n\n\n"
+        cat /home/terraspin/artifact/terraspin.log
+        echo -e "Printing Plan Status...\n\n"
+        jq -r .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/applyStatus
+        exit 127
+    fi
+
+    jq -r .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/applyStatus | grep -E "Apply complete! Resources: "
+
+    echo -e '\n\n \t\t =================================== Additional Info ========================================= \t\t\n\n'
+
+    terraform show -no-color /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/.terraform/modules/terraModule/aws/ec2/terraform.tfstate
+
+    echo 'SPINNAKER_PROPERTY_APPLYSTATUS='$APPLYSTATUS
+
+    exit 0
+   
 else
-    #while :; do echo '*print*'; sleep 5; done
-    exit 127
+    ## Error while executing terraform plan
+    echo -e "Error encountered while executing Terraform Apply\n\n\n"
+    cat /home/terraspin/artifact/terraspin.log
+    exit $RETURN_CODE
 fi
 
 

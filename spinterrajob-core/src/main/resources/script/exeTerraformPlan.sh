@@ -7,8 +7,8 @@ cd $planDir
 
 if [ $# -eq 2 ] 
 then
-    terraform plan -no-color -var-file=$variablefile
+    terraform plan -no-color -out /home/terraspin/.opsmx/script/plan_out -var-file=$variablefile
 
 else
-    terraform plan -no-color 
+    terraform plan -no-color -out /home/terraspin/.opsmx/script/plan_out
 fi
