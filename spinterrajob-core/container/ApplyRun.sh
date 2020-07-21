@@ -7,7 +7,7 @@ RETURN_CODE=$?
 if [ $RETURN_CODE -eq 0 ]; then
 
     echo -e "Terraform Apply Execution completed Successfully"
-    echo -e '\n\n \t\t ================================ Terraform Apply Output ====================================== \t\t\n\n'
+    echo -e '\n\n \t ================================ Terraform Apply Output ====================================== \t\t\n\n'
 
     APPLYSTATUS=`jq -r .status /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/applyStatus | tr -d '\n'`
 
@@ -18,14 +18,14 @@ if [ $RETURN_CODE -eq 0 ]; then
         cat /home/terraspin/artifact/terraspin.log
         echo -e "Printing Plan Status...\n\n"
         jq -r .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/applyStatus
-        exit 127
+        exit 1
     fi
 
     jq -r .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/applyStatus | grep -E "Apply complete! Resources: "
 
-    echo -e '\n\n \t\t =================================== Additional Info ========================================= \t\t\n\n'
+    echo -e '\n\n \t =================================== Additional Info ========================================= \t\t\n\n'
 
-    terraform show -no-color /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/.terraform/modules/terraModule/aws/ec2/terraform.tfstate
+    terraform show -no-color $HOME/terraform.tfstate
 
     echo 'SPINNAKER_PROPERTY_APPLYSTATUS='$APPLYSTATUS
 

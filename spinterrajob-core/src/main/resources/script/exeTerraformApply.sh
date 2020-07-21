@@ -9,7 +9,9 @@ cd $planDir
 
 if [ $# -eq 2 ] 
 then
-   terraform apply -no-color -var-file=$variablefile 
+   terraform apply -no-color -compact-warnings -var-file=$variablefile
 else
-   terraform apply -no-color 
+   terraform apply -no-color -compact-warnings
 fi
+
+cp terraform.tfstate $HOME/

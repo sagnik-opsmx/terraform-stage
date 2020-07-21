@@ -17,7 +17,7 @@ if [ $RETURN_CODE -eq 0 ]; then
     if [ $DESTROYSTATUS != "SUCCESS" ]; then
 	echo "Failed while executing Terraform Destroy stage\n\n\n"
         cat /home/terraspin/artifact/terraspin.log
-        exit 127
+        exit 1
     fi
 
     jq -r .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/destroyStatus | grep -E "Destroy complete! Resources: "

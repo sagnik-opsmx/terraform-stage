@@ -30,8 +30,8 @@ RUN mkdir -p /home/terraspin/artifact /home/terraspin/extra /home/terraspin/over
 
 WORKDIR /home/terraspin
 
-RUN wget https://releases.hashicorp.com/terraform/0.12.16/terraform_0.12.16_linux_amd64.zip && \
-    unzip -a terraform_0.12.16_linux_amd64.zip && \
+RUN wget https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip && \
+    unzip -a terraform_0.12.28_linux_amd64.zip && \
     chmod +x terraform
 
 USER root
