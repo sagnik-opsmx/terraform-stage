@@ -25,7 +25,13 @@ if [ $RETURN_CODE -eq 0 ]; then
 
     echo -e '\n\n \t =================================== Additional Info ========================================= \t\t\n\n'
 
-    terraform show -no-color /home/terraspin/.opsmx/script/plan_out
+    # Run terraform init to download plugins associated with provider
+    cd $HOME/state_dir/
+    terraform init > /dev/null
+
+    # Show the output of terraform plan
+    terraform show -no-color $HOME/state_dir/planOut
+    cd $HOME
 
     exit 0
 

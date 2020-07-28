@@ -25,17 +25,19 @@ if [ $RETURN_CODE -eq 0 ]; then
 
     echo -e '\n\n \t =================================== Additional Info ========================================= \t\t\n\n'
 
-    terraform show -no-color $HOME/terraform.tfstate
+    cd $HOME/state_dir
+    terraform init > /dev/null
+    terraform show -no-color terraform.tfstate
+    cd $HOME
 
+    cat /home/terraspin/artifact/terraspin.log | grep 'SPINNAKER_PROPERTY_'
     echo 'SPINNAKER_PROPERTY_APPLYSTATUS='$APPLYSTATUS
 
     exit 0
-   
+
 else
     ## Error while executing terraform plan
     echo -e "Error encountered while executing Terraform Apply\n\n\n"
     cat /home/terraspin/artifact/terraspin.log
     exit $RETURN_CODE
 fi
-
-
