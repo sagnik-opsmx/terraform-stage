@@ -25,11 +25,13 @@ if [ $RETURN_CODE -eq 0 ]; then
 
     echo -e '\n\n \t =================================== Additional Info ========================================= \t\t\n\n'
 
+    # Run terraform init to download plugins associated with provider
     cd $HOME/state_dir
     terraform init > /dev/null
     terraform show -no-color terraform.tfstate
     cd $HOME
 
+    # Get the SPINNAKER_PROPERTY variable already set by the java program and display on the console
     cat /home/terraspin/artifact/terraspin.log | grep 'SPINNAKER_PROPERTY_'
     echo 'SPINNAKER_PROPERTY_APPLYSTATUS='$APPLYSTATUS
 
