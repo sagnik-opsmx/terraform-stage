@@ -1,22 +1,43 @@
 #!/bin/bash
 
-#nohup java -Dspring.config.location=/home/terraspin/opsmx/app/config/application.properties  -jar /home/terraspin/artifact/TerraSpin.jar > /home/terraspin/artifact/terraspin.log 2>&1 &
+echo -e "Executing Terraform Plan ...."
+java -jar /home/terraspin/artifact/TerraSpin.jar 2>&1 > /home/terraspin/artifact/terraspin.log
 
-#java -jar /home/terraspin/artifact/TerraSpin.jar --application.iscontainer.env=true
-java -jar /home/terraspin/artifact/TerraSpin.jar
+RETURN_CODE=$?
 
-# For Debugging, Docker should alive! Uncommment while portation to keep containe live
-# while :; do echo '*print*'; sleep 5; done
+if [ $RETURN_CODE -eq 0 ]; then
 
-if [ $? -eq 0 ]; then
-    echo -e '\n\n \t\t ================================ Terraform Plan Output ====================================== \t\t\n\n'
-    jq .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/planStatus | xargs -0 echo -e
-    #while :; do echo '*print*'; sleep 5; done
+    echo -e "Terraform Plan Execution completed Successfully"
+    echo -e '\n\n \t ================================ Terraform Plan Output ====================================== \t\t\n\n'
+
+    PLANSTATUS=`jq -r .status /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/planStatus | tr -d '\n'`
+
+    echo -e 'Terraform Plan Status:' $PLANSTATUS "\n"
+
+    if [ $PLANSTATUS != "SUCCESS" ]; then
+	echo "Failed while executing Terraform Plan stage\n\n\n"
+        cat /home/terraspin/artifact/terraspin.log
+        jq -r .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/planStatus
+        exit 1
+    fi
+
+    jq -r .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/planStatus | grep -E "Plan: "
+
+    echo -e '\n\n \t =================================== Additional Info ========================================= \t\t\n\n'
+
+    # Run terraform init to download plugins associated with provider
+    cd $HOME/state_dir/
+    terraform init > /dev/null
+
+    # Show the output of terraform plan
+    terraform show -no-color $HOME/state_dir/planOut
+    cd $HOME
+
     exit 0
+
 else
-    #while :; do echo '*print*'; sleep 5; done
-    exit 127
+    ## Error while executing terraform plan
+    echo -e "Error encountered while executing Terraform Plan\n"
+    cat /home/terraspin/artifact/terraspin.log
+    exit $RETURN_CODE
 fi
-
-
-

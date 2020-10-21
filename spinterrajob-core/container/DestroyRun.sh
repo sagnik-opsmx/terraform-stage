@@ -1,19 +1,33 @@
 #!/bin/bash
 
-#nohup java -Dspring.config.location=/home/terraspin/opsmx/app/config/application.properties  -jar /home/terraspin/artifact/TerraSpin.jar > /home/terraspin/artifact/terraspin.log 2>&1 &
+echo -e "Executing Terraform Destroy ...."
+java -jar /home/terraspin/artifact/TerraSpin.jar 2>&1 > /home/terraspin/artifact/terraspin.log
 
-#java -jar /home/terraspin/artifact/TerraSpin.jar --application.iscontainer.env=true
-java -jar /home/terraspin/artifact/TerraSpin.jar
+RETURN_CODE=$?
 
-#  For Debugging, Docker should alive! Uncommment while portation to keep containe live
-#while :; do echo '*print*'; sleep 5; done
+if [ $RETURN_CODE -eq 0 ]; then
 
-if [ $? -eq 0 ]; then
+    echo -e "Terraform Destroy Execution completed Successfully"
     echo -e '\n\n \t\t ================================ Terraform Destroy Output ====================================== \t\t\n\n'
-    jq .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/destroyStatus | xargs -0 echo -e
-    exit 0   
+
+    DESTROYSTATUS=`jq -r .status /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/destroyStatus | tr -d '\n'`
+
+    echo -e 'Terraform Destroy Status:' $DESTROYSTATUS "\n"
+
+    if [ $DESTROYSTATUS != "SUCCESS" ]; then
+	echo "Failed while executing Terraform Destroy stage\n\n\n"
+        cat /home/terraspin/artifact/terraspin.log
+        exit 1
+    fi
+
+    jq -r .output /home/terraspin/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId/destroyStatus | grep -E "Destroy complete! Resources: "
+
+    exit 0 
 else
-    exit 127
+    ## Error while executing terraform plan
+    echo -e "Error encountered while executing Terraform Destroy\n\n\n"
+    cat /home/terraspin/artifact/terraspin.log
+    exit $RETURN_CODE
 fi
 
 
