@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 OpsMX, Inc.
+ * Copyright OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,8 +131,6 @@ public boolean runcommandwithindir(String command, String dir) {
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
