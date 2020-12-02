@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 OpsMX, Inc.
+ * Copyright OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,6 @@ public class TerraService {
 
 	ApplicationStartup ApplicationStartup = new ApplicationStartup();
 	JSONParser parser = new JSONParser();
-	/*
-	 * @Autowired TerraAppUtil terraAppUtil1;
-	 */
 	TerraAppUtil terraAppUtil = new TerraAppUtil();
 	ProcessUtil processutil = new ProcessUtil();
 
@@ -58,10 +55,6 @@ public class TerraService {
 	String spinApplicationName = "spinApp";
 	String spinPipelineName = "spinPipe";
 	String spinpiPelineId = "spinPipeId";
-	String spinPlan = System.getenv("plan");
-	String spinGitAccount = System.getenv("gitAccount");
-	String spincloudAccount = System.getenv("cloudAccount");
-	String spinArtifactAccount = System.getenv("artifactAccount");
 	String applicationName = "applicationName-" + spinApplicationName;
 	String pipelineName = "pipelineName-" + spinPipelineName;
 	String pipelineId = "pipelineId-" + spinpiPelineId;
@@ -74,6 +67,9 @@ public class TerraService {
 		log.info("pipelineName:" + pipelineName);
 		log.info("pipelineId:" + pipelineId);
 
+		String tfScriptArtifactAccount = System.getenv("tfScriptArtifactAccount").toString().trim();
+		String spinPlan = System.getenv("plan").toString().trim();
+
 		File currentTerraformInfraCodeDir = terraAppUtil.createDirForPipelineId(applicationName, pipelineName,
 				pipelineId);
 
@@ -85,7 +81,7 @@ public class TerraService {
 		InputStream statusInputStream = new ByteArrayInputStream(status.toString().getBytes(StandardCharsets.UTF_8));
 		terraAppUtil.writeStreamOnFile(statusFile, statusInputStream);
 
-		terraServicePlanSetting(artifactconfigaccount, spinArtifactAccount, spinPlan, currentTerraformInfraCodeDir,
+		terraServicePlanSetting(artifactconfigaccount, tfScriptArtifactAccount, spinPlan, currentTerraformInfraCodeDir,
 				artifactType);
 
 		TerraformIntialInitThread terraInitialInitOperationCall = new TerraformIntialInitThread(
@@ -180,7 +176,7 @@ public class TerraService {
 	}
 
 	public void terraServicePlanSetting(JSONObject artifactconfigaccount, String artifactAccount, String spinPlan,
-			File currentTerraformInfraCodeDir, String artifactType ) {
+			File currentTerraformInfraCodeDir, String artifactType) {
 		String terraformInfraCode = null;
 
 		if (StringUtils.isNoneEmpty(artifactAccount)) {
@@ -191,12 +187,14 @@ public class TerraService {
 			}
 			if (StringUtils.equalsAnyIgnoreCase(artifactType, "Github")) {
 				String artifactHost = artifactconfigaccount.get("host").toString().trim();
-				String planConfig = new String("module \"terraModule\"{source = \"git::" + artifactHost+ "/REPONAME\"}");
+				String planConfig = new String(
+						"module \"terraModule\"{source = \"git::" + artifactHost + "/REPONAME\"}");
 				terraformInfraCode = planConfig.replaceAll("REPONAME", spinPlan);
 			}
 			if (StringUtils.equalsAnyIgnoreCase(artifactType, "Bitbucket")) {
 				String artifactHost = artifactconfigaccount.get("host").toString().trim();
-				String planConfig = new String("module \"terraModule\"{source = \"git::" + artifactHost+ "/REPONAME\"}");
+				String planConfig = new String(
+						"module \"terraModule\"{source = \"git::" + artifactHost + "/REPONAME\"}");
 				terraformInfraCode = planConfig.replaceAll("REPONAME", spinPlan);
 			}
 
@@ -302,7 +300,7 @@ public class TerraService {
 
 				String applyOutputURL = baseURL + "/api/v1/terraform/applyOutput/" + applicationName + "/"
 						+ pipelineName + "/" + pipelineId;
-				
+
 				String tfModuledir = findModuleRootDir();
 				File exacttfRootModuleFilePathdir = new File(tfModuledir);
 
@@ -427,8 +425,6 @@ public class TerraService {
 		log.info("-----ischangemod status ----" + ischangemod);
 
 		String tfModuledir = findModuleRootDir();
-		// String exacttfRootModuleFilePathinStr = currentTerraformInfraCodeDir + "/" +
-		// tfModuledir;
 		File exacttfRootModuleFilePathdir = new File(tfModuledir);
 
 		TerraformDestroyThread terraOperationCall = new TerraformDestroyThread(exacttfRootModuleFilePathdir,
@@ -439,7 +435,6 @@ public class TerraService {
 		try {
 			trigger.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -508,7 +503,7 @@ public class TerraService {
 		log.debug("terraform destroy output :" + strToR);
 		return strToR;
 	}
-	
+
 	public String findModuleRootDir() {
 
 		String currentTerraformInfraCodeDir = userHomeDir
@@ -547,7 +542,8 @@ public class TerraService {
 		String currentTerraformInfraCodeDir = userHomeDir
 				+ "/.opsmx/spinnaker/applicationName-spinApp/pipelineName-spinPipe/pipelineId-spinPipeId";
 
-		if (StringUtils.equalsIgnoreCase(artifactType, "Github") || StringUtils.equalsIgnoreCase(artifactType, "Bitbucket")) {
+		if (StringUtils.equalsIgnoreCase(artifactType, "Github")
+				|| StringUtils.equalsIgnoreCase(artifactType, "Bitbucket")) {
 			String tfModulejsonpath = currentTerraformInfraCodeDir + "/.terraform/modules/modules.json";
 			String tfModulejson = terraAppUtil.getStrJson(tfModulejsonpath);
 
