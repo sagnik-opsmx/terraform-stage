@@ -13,17 +13,18 @@ webhook:
         - "application/json"
     payload: |-
       {
-        "artifactAccount": "${#root['parameterValues']['artifactaccount']}",
+        "tfScriptArtifactAccount": "${#root['parameterValues']['tfScriptArtifactAccount']}",
         "plan": "${#root['parameterValues']['terraformplan']}",
         "variableOverrideFileRepo": "${#root['parameterValues']['overridefile']}",
+        "tfStateArtifactAccount": "${#root['parameterValues']['tfStateArtifactAccount']}",
         "stateRepo": "${#root['parameterValues']['staterepo']}",
         "uuId": "${#root['parameterValues']['uuid']}"
       }
     parameters:
-    - label: Artifact account
-      name: artifactaccount
+    - label: Tf script account
+      name: tfScriptArtifactAccount
       type: string
-      description: pass your artifact account name.
+      description: "Please enter the artifact account name from artifactsaccounts.json, Account where you have tf script present."
       defaultValue: ''
     - label: Terraform plan
       name: terraformplan
@@ -34,6 +35,11 @@ webhook:
       name: overridefile
       type: string
       description: pass overrideVariableFile path if you want to override default variables.
+      defaultValue: ''
+    - label: Tf state account
+      name: tfStateArtifactAccount
+      type: string
+      description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state."
       defaultValue: ''
     - label: State repo
       name: staterepo
@@ -59,21 +65,27 @@ webhook:
         - "application/json"
     payload: |-
       {
-        "artifactAccount": "${#root['parameterValues']['artifactaccount']}",
+        "tfScriptArtifactAccount": "${#root['parameterValues']['tfScriptArtifactAccount']}",
         "variableOverrideFileRepo": "${#root['parameterValues']['overridefile']}",
+        "tfStateArtifactAccount": "${#root['parameterValues']['tfStateArtifactAccount']}",
         "stateRepo": "${#root['parameterValues']['staterepo']}",
         "uuId": "${#root['parameterValues']['uuid']}"
       }
     parameters:
-    - label: Artifact account
-      name: artifactaccount
+    - label: Tf script account
+      name: tfScriptArtifactAccount
       type: string
-      description: pass your artifact account name.
+      description: "Please enter the artifact account name from artifactsaccounts.json, Account where you have tf script present."
       defaultValue: ''
     - label: Override file
       name: overridefile
       type: string
       description: pass overrideVariableFile path if you want to override default variables.
+      defaultValue: ''
+    - label: Tf state account
+      name: tfStateArtifactAccount
+      type: string
+      description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state."
       defaultValue: ''
     - label: State repo
       name: staterepo
@@ -99,15 +111,15 @@ webhook:
         - "application/json"
     payload: |-
       {
-        "artifactAccount": "${#root['parameterValues']['artifactaccount']}",
+        "tfStateArtifactAccount": "${#root['parameterValues']['tfStateArtifactAccount']}",
         "stateRepo": "${#root['parameterValues']['staterepo']}",
         "uuId": "${#root['parameterValues']['uuid']}"
       }
     parameters:
-    - label: Artifact account
-      name: artifactaccount
+    - label: Tf state account
+      name: tfStateArtifactAccount
       type: string
-      description: pass your artifact account name.
+      description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state."
       defaultValue: ''
     - label: State repo
       name: staterepo
