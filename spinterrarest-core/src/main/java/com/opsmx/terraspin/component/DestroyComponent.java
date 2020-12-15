@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 OpsMX, Inc.
+ * Copyright OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,18 +154,18 @@ public class DestroyComponent {
 				throw new RuntimeException("Payload parse error ", e);
 			}
 
-			String spinArtifactAccount = payloadJsonObject.get("artifactAccount").toString().trim();
+			String tfStateArtifactAccount = payloadJsonObject.get("tfStateArtifactAccount").toString().trim();
 			String spinStateRepo = payloadJsonObject.get("stateRepo").toString().trim();
 			String uuId = payloadJsonObject.get("uuId").toString().trim();
 
 			log.info("System info current user -> " + System.getProperty("user.name") + " & current dir -> "
 					+ System.getProperty("user.home"));
-			log.info("Given artifact account name -> " + spinArtifactAccount);
+			log.info("Given tf state artifact account name -> " + tfStateArtifactAccount);
 			log.info("Given state repo -> " + spinStateRepo);
 			log.info("Given unique user id -> " + uuId);
 			log.info("Given current Component ->  Destroy");
 
-			if (StringUtils.isEmpty(spinArtifactAccount)) {
+			if (StringUtils.isEmpty(tfStateArtifactAccount)) {
 				log.error("Please specify artifact account it should'nt be blank or null.");
 			}
 
@@ -195,24 +195,24 @@ public class DestroyComponent {
 				throw new RuntimeException("config Parse error:", pe);
 			}
 			JSONArray artifactAccounts = (JSONArray) configObject.get("artifactaccounts");
-			JSONObject artifactAccount = null;
+			JSONObject tfStateAcutualArtifactAccount = null;
 
 			for (int i = 0; i < artifactAccounts.size(); i++) {
-				artifactAccount = (JSONObject) artifactAccounts.get(i);
-				String githubArtifactaccountName = artifactAccount.get("accountname").toString().trim();
-				if (StringUtils.equalsIgnoreCase(githubArtifactaccountName, spinArtifactAccount))
+				tfStateAcutualArtifactAccount = (JSONObject) artifactAccounts.get(i);
+				String githubArtifactaccountName = tfStateAcutualArtifactAccount.get("accountname").toString().trim();
+				if (StringUtils.equalsIgnoreCase(githubArtifactaccountName, tfStateArtifactAccount))
 					break;
 			}
 
-			String artifactType = artifactAccount.get("artifacttype").toString().trim();
+			String artifactType = tfStateAcutualArtifactAccount.get("artifacttype").toString().trim();
 
 			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType
 					+ "Provider";
 
-			ArtifactProvider currentArtifactProviderObj = null;
+			ArtifactProvider tfStateCurrentArtifactProviderObj = null;
 
 			try {
-				currentArtifactProviderObj = (ArtifactProvider) Class
+				tfStateCurrentArtifactProviderObj = (ArtifactProvider) Class
 						.forName(fullPathOfCurrentArtifactProviderImplClass).newInstance();
 
 			} catch (InstantiationException e2) {
@@ -223,13 +223,13 @@ public class DestroyComponent {
 				e2.printStackTrace();
 			}
 
-			currentArtifactProviderObj.envSetup(artifactAccount);
-			String spinStateRepoName = currentArtifactProviderObj.getArtifactSourceReopName(spinStateRepo);
+			tfStateCurrentArtifactProviderObj.envSetup(tfStateAcutualArtifactAccount);
+			String spinStateRepoName = tfStateCurrentArtifactProviderObj.getArtifactSourceReopName(spinStateRepo);
 			// String staterepoDirPath = currentUserDir + "/" + spinStateRepoName;
 			String staterepoDirPath = tfstatefilerepobasedir + fileSeparator + spinStateRepoName;
 
-			boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
-					spinStateRepoName, spinStateRepo, uuId, "destroy", artifactAccount);
+			boolean isStateRepoCloned = tfStateCurrentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
+					spinStateRepoName, spinStateRepo, uuId, "destroy", tfStateAcutualArtifactAccount);
 			if (isStateRepoCloned) {
 
 				String zipfilesrc = staterepoDirPath + fileSeparator + uuId + ".zip";
@@ -266,7 +266,7 @@ public class DestroyComponent {
 
 				if (StringUtils.equalsIgnoreCase("SUCCESS", destroystatusstr)) {
 
-					currentArtifactProviderObj.pushStateArtifactSource(currentUserDir, spinStateRepoName,
+					tfStateCurrentArtifactProviderObj.pushStateArtifactSource(currentUserDir, spinStateRepoName,
 							staterepoDirPath, uuId);
 
 					writeDestroyStatus(currentTerraformInfraCodeDir, "SUCCESS");

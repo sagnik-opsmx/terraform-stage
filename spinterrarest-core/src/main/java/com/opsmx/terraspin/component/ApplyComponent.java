@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 OpsMX, Inc.
+ * Copyright OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.opsmx.terraspin.component;
 
 import java.io.ByteArrayInputStream;
@@ -162,20 +161,22 @@ public class ApplyComponent {
 				throw new RuntimeException("Payload parse error ", e);
 			}
 
-			String spinArtifactAccount = payloadJsonObject.get("artifactAccount").toString().trim();
+			String tfScriptArtifactAccount = payloadJsonObject.get("tfScriptArtifactAccount").toString().trim();
+			String tfStateArtifactAccount = payloadJsonObject.get("tfStateArtifactAccount").toString().trim();
 			String tfVariableOverrideFileRepo = payloadJsonObject.get("variableOverrideFileRepo").toString().trim();
 			String spinStateRepo = payloadJsonObject.get("stateRepo").toString().trim();
 			String uuId = payloadJsonObject.get("uuId").toString().trim();
 
 			log.info("System info current user -> " + System.getProperty("user.name") + " & current dir -> "
 					+ System.getProperty("user.home"));
-			log.info("Given artifact account name -> " + spinArtifactAccount);
+			log.info("Given tf script artifact account name -> " + tfScriptArtifactAccount);
+			log.info("Given tf state artifact account name -> " + tfStateArtifactAccount);
 			log.info("Given override file path -> " + tfVariableOverrideFileRepo);
 			log.info("Given state repo -> " + spinStateRepo);
 			log.info("Given unique user id -> " + uuId);
 			log.info("Given current Component ->  Apply");
 
-			if (StringUtils.isEmpty(spinArtifactAccount)) {
+			if (StringUtils.isEmpty(tfScriptArtifactAccount)) {
 				log.error("Please specify artifact account it should'nt be blank or null.");
 			}
 
@@ -194,25 +195,52 @@ public class ApplyComponent {
 			}
 
 			JSONArray artifactAccounts = (JSONArray) configObject.get("artifactaccounts");
-			JSONObject artifactAccount = null;
+			JSONObject tfScriptAcutualArtifactAccount = null;
 
 			for (int i = 0; i < artifactAccounts.size(); i++) {
-				artifactAccount = (JSONObject) artifactAccounts.get(i);
-				String artifactaccountName = artifactAccount.get("accountname").toString().trim();
-				if (StringUtils.equalsIgnoreCase(artifactaccountName, spinArtifactAccount))
+				tfScriptAcutualArtifactAccount = (JSONObject) artifactAccounts.get(i);
+				String artifactaccountName = tfScriptAcutualArtifactAccount.get("accountname").toString().trim();
+				if (StringUtils.equalsIgnoreCase(artifactaccountName, tfScriptArtifactAccount))
 					break;
 			}
 
-			String artifactType = (String) artifactAccount.get("artifacttype");
+			String tfScriptArtifactType = (String) tfScriptAcutualArtifactAccount.get("artifacttype");
 
-			String fullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + artifactType.trim()
+			String tfScriptFullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + tfScriptArtifactType.trim()
 					+ "Provider";
 
-			ArtifactProvider currentArtifactProviderObj = null;
+			ArtifactProvider tfScriptCurrentArtifactProviderObj = null;
 
 			try {
-				currentArtifactProviderObj = (ArtifactProvider) Class
-						.forName(fullPathOfCurrentArtifactProviderImplClass).newInstance();
+				tfScriptCurrentArtifactProviderObj = (ArtifactProvider) Class
+						.forName(tfScriptFullPathOfCurrentArtifactProviderImplClass).newInstance();
+
+			} catch (InstantiationException e2) {
+				e2.printStackTrace();
+			} catch (IllegalAccessException e2) {
+				e2.printStackTrace();
+			} catch (ClassNotFoundException e2) {
+				e2.printStackTrace();
+			}
+			
+			JSONObject tfStateAcutualArtifactAccount = null;
+
+			for (int i = 0; i < artifactAccounts.size(); i++) {
+				tfStateAcutualArtifactAccount = (JSONObject) artifactAccounts.get(i);
+				String artifactaccountName = tfStateAcutualArtifactAccount.get("accountname").toString().trim();
+				if (StringUtils.equalsIgnoreCase(artifactaccountName, tfStateArtifactAccount))
+					break;
+			}
+			
+			String tfStateArtifactType = tfStateAcutualArtifactAccount.get("artifacttype").toString().trim();
+			
+			String tfStateFullPathOfCurrentArtifactProviderImplClass = "com.opsmx.terraspin.artifact." + tfStateArtifactType	+ "Provider";
+
+			ArtifactProvider tfStateCurrentArtifactProviderObj = null;
+
+			try {
+				tfStateCurrentArtifactProviderObj = (ArtifactProvider) Class.forName(tfStateFullPathOfCurrentArtifactProviderImplClass)
+						.newInstance();
 
 			} catch (InstantiationException e2) {
 				e2.printStackTrace();
@@ -222,8 +250,9 @@ public class ApplyComponent {
 				e2.printStackTrace();
 			}
 
-			currentArtifactProviderObj.envSetup(artifactAccount);
-			String spinStateRepoName = currentArtifactProviderObj.getArtifactSourceReopName(spinStateRepo);
+			tfScriptCurrentArtifactProviderObj.envSetup(tfScriptAcutualArtifactAccount);
+			tfStateCurrentArtifactProviderObj.envSetup(tfStateAcutualArtifactAccount);
+			String spinStateRepoName = tfStateCurrentArtifactProviderObj.getArtifactSourceReopName(spinStateRepo);
 			// String staterepoDirPath = currentUserDir + "/" + spinStateRepoName;
 			String staterepoDirPath = tfstatefilerepobasedir + fileSeparator + spinStateRepoName;
 			String tfVariableOverrideFileRepoName = new String();
@@ -252,16 +281,16 @@ public class ApplyComponent {
 					.getResourceAsStream(fileSeparator + "script" + fileSeparator + "exeTerraformModuleOutput.sh"));
 
 			if (!StringUtils.isEmpty(tfVariableOverrideFileRepo)) {
-				tfVariableOverrideFileRepoName = currentArtifactProviderObj
+				tfVariableOverrideFileRepoName = tfScriptCurrentArtifactProviderObj
 						.getArtifactSourceReopName(tfVariableOverrideFileRepo);
-				tfVariableOverrideFileName = currentArtifactProviderObj
+				tfVariableOverrideFileName = tfScriptCurrentArtifactProviderObj
 						.getOverrideFileNameWithPath(tfVariableOverrideFileRepo);
 
-				String tfVariableOverrideFileReopNameWithUsername = currentArtifactProviderObj
+				String tfVariableOverrideFileReopNameWithUsername = tfScriptCurrentArtifactProviderObj
 						.getArtifactSourceReopNameWithUsername(tfVariableOverrideFileRepo);
 
-				boolean isOverrideVariableRepoCloned = currentArtifactProviderObj
-						.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername, artifactAccount);
+				boolean isOverrideVariableRepoCloned = tfScriptCurrentArtifactProviderObj
+						.cloneOverrideFile(overridefilerepobasedir, tfVariableOverrideFileReopNameWithUsername, tfScriptAcutualArtifactAccount);
 
 				if (isOverrideVariableRepoCloned) {
 					overrideVariableFilePath = overridefilerepobasedir + fileSeparator + tfVariableOverrideFileRepoName
@@ -271,8 +300,8 @@ public class ApplyComponent {
 				}
 			}
 
-			boolean isStateRepoCloned = currentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
-					spinStateRepoName, spinStateRepo, uuId, "apply", artifactAccount);
+			boolean isStateRepoCloned = tfStateCurrentArtifactProviderObj.pullStateArtifactSource(tfstatefilerepobasedir,
+					spinStateRepoName, spinStateRepo, uuId, "apply", tfStateAcutualArtifactAccount);
 
 			if (isStateRepoCloned) {
 
@@ -314,8 +343,8 @@ public class ApplyComponent {
 
 				if (StringUtils.equalsIgnoreCase("SUCCESS", applystatusstr)) {
 
-					currentArtifactProviderObj.pushStateArtifactSource(currentUserDir, spinStateRepoName,
-							staterepoDirPath, uuId);
+					tfStateCurrentArtifactProviderObj.pushStateArtifactSource(currentUserDir, spinStateRepoName, staterepoDirPath,
+							uuId);
 
 					writeApplyStatus(currentTerraformInfraCodeDir, "SUCCESS");
 

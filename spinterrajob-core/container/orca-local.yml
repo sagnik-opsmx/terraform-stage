@@ -11,7 +11,7 @@ job:
         waitForCompletion: true
         parameters:
           - defaultValue: "" 
-            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you have tf script(plan) present".
+            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you have tf script present."
             label: Tf script account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Tf script account
@@ -26,7 +26,7 @@ job:
             mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
             name: Override file
           - defaultValue: "" 
-            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state".
+            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state."
             label: Tf state account
             mapping: 'manifest.spec.template.spec.containers[0].env[3].value'
             name: Tf state account
@@ -80,7 +80,6 @@ job:
                   - secret:
                       secretName: terraspinbackendconfig
                     name: opsmx-terraspin-backend-config
-
       - label: TSApplyJob
         application: opsmx
         cloudProvider: kubernetes
@@ -92,7 +91,7 @@ job:
         waitForCompletion: true
         parameters:
           - defaultValue: "" 
-            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you have tf script(plan) present".
+            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you have tf script present."
             label: Tf script account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Tf script account
@@ -102,7 +101,7 @@ job:
             mapping: 'manifest.spec.template.spec.containers[0].env[1].value'
             name: Override file
           - defaultValue: "" 
-            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state".
+            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state."
             label: Tf state account
             mapping: 'manifest.spec.template.spec.containers[0].env[2].value'
             name: Tf state account
@@ -145,16 +144,15 @@ job:
                     image: 'docker.io/opsmx11/terraspinjob:5.0'
                     imagePullPolicy: Always
                     name: terraspinapply
-                    volumeMounts:
-                      - mountPath: /home/terraspin/opsmx/app/config/
-                        readOnly: true
-                        name: opsmx-terraspin-backend-config
-                restartPolicy: Never
-                volumes:
-                  - secret:
-                      secretName: terraspinbackendconfig
-                    name: opsmx-terraspin-backend-config
-
+                    volumeMounts:                                                                                                       
+                      - mountPath: /home/terraspin/opsmx/app/config/                                                                    
+                        readOnly: true                                                                                                  
+                        name: opsmx-terraspin-backend-config                                                                            
+                restartPolicy: Never                                                                                                   
+                volumes:                                                                                                                
+                  - secret:                                                                                                             
+                      secretName: terraspinbackendconfig                                                                                
+                    name: opsmx-terraspin-backend-config 
       - label: TSDestroyJob
         application: opsmx
         cloudProvider: kubernetes
@@ -165,7 +163,7 @@ job:
         waitForCompletion: true
         parameters:
           - defaultValue: "" 
-            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state".
+            description: "Please enter the artifact account name from artifactsaccounts.json, Account where you want to save tf state."
             label: Tf state account
             mapping: 'manifest.spec.template.spec.containers[0].env[0].value'
             name: Tf state account
@@ -204,12 +202,13 @@ job:
                     image: 'docker.io/opsmx11/terraspinjob:5.0'
                     imagePullPolicy: Always
                     name: terraspindestroy
-                    volumeMounts:
-                      - mountPath: /home/terraspin/opsmx/app/config/
-                        readOnly: true
-                        name: opsmx-terraspin-backend-config
-                restartPolicy: Never
-                volumes:
-                  - secret:
-                      secretName: terraspinbackendconfig
-                    name: opsmx-terraspin-backend-config
+                    volumeMounts:                                                                                                       
+                      - mountPath: /home/terraspin/opsmx/app/config/                                                                    
+                        readOnly: true                                                                                                  
+                        name: opsmx-terraspin-backend-config                                                                            
+                restartPolicy: Never                                                                                                   
+                volumes:                                                                                                                
+                  - secret:                                                                                                             
+                      secretName: terraspinbackendconfig                                                                                
+                    name: opsmx-terraspin-backend-config 
+

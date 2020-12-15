@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 OpsMX, Inc.
+ * Copyright OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,13 +47,8 @@ public class TerraService {
 
 	ApplicationStartup ApplicationStartup = new ApplicationStartup();
 	JSONParser parser = new JSONParser();
-
-	/*
-	 * @Autowired TerraAppUtil terraAppUtil1;
-	 */
 	TerraAppUtil terraAppUtil = new TerraAppUtil();
 	ProcessUtil processutil = new ProcessUtil();
-	// File exacttfRootModuleFilePathdir;
 
 	static String userHomeDir = System.getProperty("user.home");
 	static String DEMO_HTML = "<!DOCTYPE html> <html> <head> <meta charset=\"UTF-8\"> <title>Opsmx TerraApp</title> </head> <body bgcolor='#000000'> <pre style=\"color:white;\"> \"OPTION_SCPACE\" </pre> </body> </html>";

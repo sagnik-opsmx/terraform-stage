@@ -15,7 +15,7 @@ spec:
         app: terraspinrestapp
     spec:
       containers:
-        - image: 'docker.io/opsmx11/terraspinrest:4.0'
+        - image: 'docker.io/opsmx11/terraspinrest:5.0'
           imagePullPolicy: Always
           name: terraspinrest
           ports:
@@ -24,11 +24,13 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /home/terraspin/opsmx/app/config/
+              readOnly: true
               name: opsmx-terraspin-backend-config
       volumes:
-        - configMap:
-            name: terraspinbackendconfig
+        - secret:
+            secretName: terraspinbackendconfig
           name: opsmx-terraspin-backend-config
+
 
 ---
 apiVersion: v1
