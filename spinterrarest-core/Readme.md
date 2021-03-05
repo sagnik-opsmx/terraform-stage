@@ -1,7 +1,7 @@
 # Terraspin Rest -- :whale:
 
 A microservice to integrate with Spinnaker for planning, applying and destroying Terraform plans
-[TerraSpin Rest configuraton with Spinnaker detail doc available here](https://docs.opsmx.com/codelabs/spinnaker-terraform-webhook/) 
+[TerraSpin Rest configuraton with Spinnaker detail doc available here](https://docs.opsmx.com/codelabs/how-to-create-terraform-webhook-stage-in-spinnaker) 
 
 ## Developing Terraspin
 Need to run terraSpin locally for development? Here's what you need to setup and run:
