@@ -114,11 +114,13 @@ public class GithubProvider extends ArtifactProvider {
 	}
 
 	@Override
-	public boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername, JSONObject artifactAccount) {
+	public boolean cloneOverrideFile(String cloneDir, String tfVariableOverrideFileReopNameWithUsername,
+			JSONObject artifactAccount) {
 		log.info("cloneOverrideFile repo name with user name -> " + tfVariableOverrideFileReopNameWithUsername);
-		//String githubOverrideFileRepoCloneCommand = "git clone https://github.com/REPONAME";
+		// String githubOverrideFileRepoCloneCommand = "git clone
+		// https://github.com/REPONAME";
 		String artifactHost = artifactAccount.get("host").toString().trim();
-		String githubOverrideFileRepoCloneCommand = "git clone "  + artifactHost +"/REPONAME";
+		String githubOverrideFileRepoCloneCommand = "git clone " + artifactHost + "/REPONAME";
 		githubOverrideFileRepoCloneCommand = githubOverrideFileRepoCloneCommand.replaceAll("REPONAME",
 				tfVariableOverrideFileReopNameWithUsername);
 		// delete first cloneOverrideFile repo dir if exist then do other process
@@ -186,22 +188,17 @@ public class GithubProvider extends ArtifactProvider {
 			e.printStackTrace();
 		}
 
-		/*
-		 * String gitlfsinstallcommand = "git lfs install"; boolean
-		 * isgitlfsinstallcommandsuccess =
-		 * processutil.runcommandwithindir(gitlfsinstallcommand, staterepoDirPath);
-		 * log.info("isgitlfsinstallcommandsuccess got success :: " +
-		 * isgitlfsinstallcommandsuccess + " and process obj status " +
-		 * processutil.getStatusRootObj());
-		 * 
-		 * //String gitlfsHelpercommand = "git lfs track '" + staterepoDirPath +
-		 * "/.terraform/plugins/'"; String gitlfsHelpercommand =
-		 * "git lfs track '*.zip'"; boolean isgitlfsHelpercommandsuccess =
-		 * processutil.runcommandwithindir(gitlfsHelpercommand, staterepoDirPath);
-		 * log.info("isgitlfsHelpercommandsuccess got success :: " +
-		 * isgitlfsHelpercommandsuccess + " and process obj status " +
-		 * processutil.getStatusRootObj());
-		 */
+		String gitlfsinstallcommand = "git lfs install";
+		boolean isgitlfsinstallcommandsuccess = processutil.runcommandwithindir(gitlfsinstallcommand, staterepoDirPath);
+		log.info("isgitlfsinstallcommandsuccess got success :: " + isgitlfsinstallcommandsuccess
+				+ " and process obj status " + processutil.getStatusRootObj());
+
+		// String gitlfsHelpercommand = "git lfs track '" + staterepoDirPath +
+		// "/.terraform/plugins/'";
+		String gitlfsHelpercommand = "git lfs track '*.zip'";
+		boolean isgitlfsHelpercommandsuccess = processutil.runcommandwithindir(gitlfsHelpercommand, staterepoDirPath);
+		log.info("isgitlfsHelpercommandsuccess got success :: " + isgitlfsHelpercommandsuccess
+				+ " and process obj status " + processutil.getStatusRootObj());
 
 		String gitaddcommand = "git add .";
 		boolean isgitaddcommandsuccess = processutil.runcommandwithindir(gitaddcommand, staterepoDirPath);
@@ -232,13 +229,15 @@ public class GithubProvider extends ArtifactProvider {
 	}
 
 	@Override
-	public boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName, String spinStateRepoNameWithUserName, String uuId, String componentType, JSONObject artifactAccount) {
+	public boolean pullStateArtifactSource(String cloneDir, String spinStateRepoName,
+			String spinStateRepoNameWithUserName, String uuId, String componentType, JSONObject artifactAccount) {
 
 		log.info("Repo name -> " + spinStateRepoName + " repo name with user name -> " + spinStateRepoNameWithUserName);
 		log.info("cloning dir path " + cloneDir);
-		//String githubtfStateRepoCloneCommand = "git clone https://github.com/REPONAME";
+		// String githubtfStateRepoCloneCommand = "git clone
+		// https://github.com/REPONAME";
 		String artifactHost = artifactAccount.get("host").toString().trim();
-		String githubtfStateRepoCloneCommand = "git clone "  + artifactHost +"/REPONAME";
+		String githubtfStateRepoCloneCommand = "git clone " + artifactHost + "/REPONAME";
 		githubtfStateRepoCloneCommand = githubtfStateRepoCloneCommand.replaceAll("REPONAME",
 				spinStateRepoNameWithUserName);
 		// delete first clone dir if exist then do other process
