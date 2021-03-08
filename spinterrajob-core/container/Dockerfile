@@ -34,9 +34,15 @@ RUN wget https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linu
     unzip -a terraform_0.12.28_linux_amd64.zip && \
     chmod +x terraform
 
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" 
+
+RUN chmod +x kubectl
+
 USER root
 
 RUN mv terraform /usr/local/bin/terraform
+
+RUN mv kubectl /usr/local/bin/kubectl
 
 USER terraspin
 
